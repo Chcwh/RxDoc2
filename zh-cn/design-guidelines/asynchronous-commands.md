@@ -1,8 +1,8 @@
-# Asynchronous Commands
+# 异步命令
 
-Prefer using async `ReactiveCommand`'s over the more basic `ReactiveCommand` for all but the most simple tasks. In ReactiveUI, you should never put Interesting™ code inside the Subscribe block - Subscribe is solely to log the result of operations, or to wire up properties to other properties.
+建议在所有情况下使用异步 `ReactiveCommand` 替代更基础的 `ReactiveCommand` 命令，除了最简单的任务。在 ReactiveUI 中，不应该将业务代码放在订阅块中 - 订阅仅用于记录操作结果，或关联属性与属性。
 
-## Do
+## 应该
 
 ```csharp
 // In XAML
@@ -29,7 +29,7 @@ public class RepositoryViewModel : ReactiveObject
 }
 ```
 
-## Don't
+## 不应该
 
 ```csharp
 // In XAML
@@ -59,13 +59,13 @@ public class RepositoryViewModel : ReactiveObject
 }
 ```
 
-## Why?
+## 为什么？
 
-A lot of the power of `ReactiveCommand` comes from the async version. In the basic version the following features do not function as expected:
+许多 `ReactiveCommand` 的功能都在异步版本中。基础版本中以下特性与预期不同：
 
-* `IsExecuting` observable will not report on your asynchronous method when it is inside the `Subscribe`
-* `ThrownExceptions` will not catch anything.
-* `CanExecute` is not affected if the command is currently executing, leading to the possibilty of multiple execution at the same time.
+* `IsExecuting`  observable will not report on your asynchronous method when it is inside the `Subscribe`
+* `ThrownExceptions` 不会捕获任何东西
+* `CanExecute` 命令在执行的时候没有变化，所以有可能同时执行多个。
 
 
 
