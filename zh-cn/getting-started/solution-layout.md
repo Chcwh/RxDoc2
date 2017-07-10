@@ -1,16 +1,16 @@
 # Solution Layout
 
-We suggest the following logical naming pattern when laying out your solution:
+在设计解决方案时，建议以以下的逻辑命名：
 
 
 * image of visual studio layout video or animated gif of the side-waffle
 * extension that creates everything automatically.
 
-All application logic is stored within a core portable class library which is shared between - and referenced by - each specific platform application:
+所有的逻辑都放在一个核心可移植的类库里面，可以被不同平台的应用引用：
 
 # Core Application Library
 
-The portable class library will be the heart of your application and where you will spend most of your time. When you create the project, you will need to select a profile. You should use `Profile78` (if targeting WP8.x), `Profile259` (if targeting only WPA + Xamarin) or `Profile111` (if targeting UWP + Xamarin). Alternatively you can adjust the profile after creation by editing the `.csproj`, but you will need to run some NuGet commands to reinstall most of your packages.
+核心库是应用程序的核心，应该花费最多的时间。在创建项目的时候，需要选择配置。`Profile78` （WP8.x）, `Profile259` （仅 WPA + Xamarin） 或 `Profile111` （UWP + Xamarin）。也可以通过修改 `.csproj` 文件来调整配置，但是需要执行一些 NuGet 命令来重新安装程序包。
 
 MyCoolApp.Core.csproj:
 
@@ -35,32 +35,31 @@ MyCoolApp.Core.csproj:
 
 # Core Application Tests
 
-A standard class library that contains unit tests that confirm functionality
-of .Core.
+验证 .Core 库功能的标准测试库。
 
 # Target Platform Application
 
-An application of the platform that you are targeting that consists purely of user interface rendering code, and platform specific application logic. Create your views here and attach your views to your view model using data binding.
+包含用户界面渲染代码，以及平台特定逻辑的应用。在这里创建视图，并使用数据绑定与视图模型关联。
 
-Register your platform-specific concrete implementation of your services e.g. `iPhoneNetworkConnectivityService : INetworkConnectivityService`. You can use your favorite IOC library for this.
+注册服务中与平台相关的实现，如 `iPhoneNetworkConnectivityService : INetworkConnectivityService`。这里可以选择喜欢的 IOC 库。
 
-*Please note that the .Android namespace is reserved by Google for Android internals and must not be used. This is a Google limitation. Failure to obey this will result in heaps of pain.*
+*注意 .Android 命名空间已由 Google 在内部使用了，因此不能使用。这是 Google 的要求。不这样做会导致一些严重的后果*
 
 # Target Platform Tests
 
-How you handle this is purely up to you. Due to the way Xamarin works, this is a good opportunity to write higher level acceptance tests using Xamarin Test Cloud instead of lower level library tests. The reason behind this is that code behaves differently on physical hardware vs emulated hardware, and that the linker can sometimes be too greedy resulting in code being linked out. Sometimes the only way to pick up on that is to actually run on physical hardware.
+怎么做取决于你。介于 Xamarin 的工作原理，最好是使用 Xamarin Test Cloud 编写高级别的验收测试，而不是库级测试。这是由于代码在物理硬件上表现得与仿真硬件不同。and that the linker can sometimes be too greedy resulting in code being linked out. 有时唯一的办法就是实际运行在物理硬件上。
 
 # TL;DR
 
-A complete layout could look like the following (these are .csproj files):
-- MyCoolApp.Core - Usually a portable class library, contains the core functionality
-- MyCoolApp.Core.Tests - Tests for the core functionality
-- MyCoolApp.Droid - Device/platform specific view code
-- MyCoolApp.iOS - Device/platform specific view code
+完整的结构如下所示（都是 .csproj 文件）：
+- MyCoolApp.Core - 通常是可移植类库，包含了核心逻辑
+- MyCoolApp.Core.Tests - 核心功能的测试库
+- MyCoolApp.Droid - 设备/平台特定视图代码
+- MyCoolApp.iOS - 设备/平台特定视图代码
 
 # UWP/WPF
 
-Moved the xxxUserControl classes to a Views subfolder, and renamed them. This might just be me, but I prefer to call anything that derives from IViewFor to be a "View" and anything that acts as a control (like a custom text box or something) to go into a "Controls" subfolder. Tl;DR: "Views" => RxUI objects, "Controls" => custom Windows controls
+将 xxxUserControl 类移动到 Views 子文件夹，并重命名。可能只有我这样做，但是我倾向于将实现了 IViewFor 的所有类看作“视图”。同时将所有的控件（比如自定义的文本框或其他东西）放到 Controls 文件夹中。Tl;DR: "Views" => RxUI 对象, "Controls" => 自定义 Windows 控件
 
 ## Styles/Resource Dictionaries Convention
 
@@ -76,16 +75,16 @@ Matt:
 
 Kent:
  
-> yeah, fwiw @ghuntley, I also separate dictionaries. I have a `Theme.xaml` which merges in individual dictionaries (`Button.xaml`, `TextBox.xaml` etc). Then my `App.xaml` just merges in `Theme.xaml` of course, doing this stuff in Xamarin Forms is far more touch and go
+> 是的，fwiw @ghuntley，我也分开了字典，我有一个 `Theme.xaml` 用于合并单独的字典（`Button.xaml`, `TextBox.xaml` 等等）。然后 `App.xaml` 只合并 `Theme.xaml` 就可以了，当然 Xamarin Forms 会麻烦一些。
 
 
 Matt:
 
-> that's what I used to do, but that causes a lot of stuff to get parsed on first load when it's not necessary
+> 我以前就是这么干的，但这么做的结果就是有许多不必要的东西在首次加载的时候会被解析
 
-> so only the stuff that I ​_know_​ will get used on 95% of all xaml pages get added to the `App`'s resources. things like the color palette
+> 所以只有在95% 的地方都要用到的东西才值得放到 `App` 的资源中。比如调色板。
 
-> it means you have to do a little more work inside each user control, because you get stuff like this:
+> 这意味着你需要在每个控件中多做一些事情。比如说这样：
 
     ```<UserControl.Resources>
         <ResourceDictionary>
@@ -99,18 +98,17 @@ Matt:
     </UserControl.Resources>
     ```
 
-> but you only take the hit for loading `PasswordBox.xaml` once, when the first page requires it. If you never browse to one of those pages, then your app never takes the time to parse that file
+> 但是只需要当第一个页面需要的时候加载 `PasswordBox.xaml` 一次。如果不访问那些页面，应用就不会加载解析这个文件。
 
 Kent:
 
-> interesting approach. I never ran into any perf walls, so never needed to do anything differently
+> 这个方法有点意思。但我从来没遇到问题，所以也不需要特别处理。
 
 Matt: 
 
-> it speeds up the initial application load somewhat if you have a lot of styles
-    basically takes that initial 50ms of initial app load, and parcels it out in 5-10ms hits on individual pages
+> 这么做会提升应用程序启动速度，初始化要 50ms，打包每个独立的页面都需要 5-10ms。
 
-> my `Resources` tree usually looks something like this:
+> 我的 `Resources` 树通常像这样：
 
     ​[2:40] 
     ```\Resources
@@ -135,13 +133,12 @@ Matt:
 
 Kent:
  
- > I think I’d prefer to make the user wait an extra 50ms (on top of the several seconds they already have to wait for WPF/.NET to bootstrap) than force devs to deal with this. I guess UWP may be different because of native compilation and usage patterns. Desktop software is Different.
+ > 我想我更愿意让用户多等待 50ms（他们已经等待 WPF/.NET 引导的几秒钟了），而不是强迫开发人员处理这个问题。UWP 由于本地编译和使用模式的不同有所区别。桌面软件是不一样的。
 
 Matt:
 
-> it's a tradeoff, for sure on mobile, it's been a noticeable difference when I apply this pattern
+> 这需要权衡取舍。但是在移动设备上，这是明显的区别，当我应用了这种模式的时候。
 
-> if I were doing WPF, I'd probably just have everything referenced in a single RD which is included in the app.xaml, as you said
-> Oh, I found the blog post: http://projekt202.com/blog/2010/xaml-organization/
-> I think I've improved upon this, but this blog entry is where I got started with `ResourceDictionary` organization
+> 如果我使用 WPF我可能就想所有需要的引用包含到一个 app.xaml 的 RD 中了，就如你说的那样。我找到一个博客： http://projekt202.com/blog/2010/xaml-organization/
+> 从这里我开始组织 `ResourceDictionary`，在此基础上也做了一些改进。
 

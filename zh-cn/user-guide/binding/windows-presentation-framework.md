@@ -1,11 +1,10 @@
 # Windows Presentation Framework
 
-Super important to use the `WhenActivated` method on WPF to avoid leaking memory  -> https://codereview.stackexchange.com/questions/74642/a-viewmodel-using-reactiveui-6-that-loads-and-sends-data
+在 WPF 中很重要的一点是使用 `WhenActivated` 方法，以避免内存泄露  -> https://codereview.stackexchange.com/questions/74642/a-viewmodel-using-reactiveui-6-that-loads-and-sends-data
 
 
-    the XAML DependencyProperty system causes memory leaks if you don't use `WhenActivated`
-    there's a few rules, but the number one rule is: if you do a `WhenAny` on anything other
-    than `this`, then you need to put it inside a `WhenActivated`
+    如果不使用 `WhenActivated` ，XAML DependencyProperty 会导致内存泄露。
+	有一些规则，但第一条就是：如果在 `this` 以外的地方使用了 `WhenAny` 应该将其放到 `WhenActivated` 中
 
     this.WhenActivated(d =>
     {
@@ -21,13 +20,13 @@ Super important to use the `WhenActivated` method on WPF to avoid leaking memory
 
 # Chatlog
 
-    is it still impossible to use RXUI binding inside ItemTemplate?
+    是否还不能在 ItemTemplate 内部使用 RXUI 绑定？
     
     paulcbetts [5:35 AM] 
-    Yes
+    是的
     
     ionoy [5:35 AM] 
-    damn
+    该死
     
     paulcbetts [5:35 AM] 
     Well, inside an implicit DataTemplate

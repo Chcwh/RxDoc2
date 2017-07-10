@@ -8,29 +8,16 @@
     },
     "disabledPlugins": [ "image-captions"],
     "plugins": [
-        "clicky",
-        "sitemap",
         "richquotes",
         "printlinks",
         "video",
         "-highlight",
         "github",
-        "edit-link",
         "anchors"
     ],
     "pluginsConfig": {
-        "edit-link": {
-          "base": "https://github.com/reactiveui/documentation/edit/master",
-          "label": "Edit This Page"
-        },
         "github": {
           "url": "https://github.com/reactiveui/documentation"
-        },
-        "sitemap": {
-            "hostname": "http://docs.reactiveui.net/"
-        },
-        "clicky": {
-            "site_id": "100909796"
         }
     }
 }

@@ -1,4 +1,4 @@
-# An Example
+# 例子
 
 ```cs
 public class LoginViewModel : ReactiveObject
@@ -28,8 +28,7 @@ public class LoginViewModel : ReactiveObject
 
     public ReactiveCommand<Unit, Unit> LoginCommand => this.loginCommand;
 
-    // note that if no client code requires the full API of the generic ReactiveCommand<TParam, TResult>,
-    // we can just declare the type as ReactiveCommand
+    // 如果不需要泛型 ReactiveCommand<TParam, TResult> 的完整 API ，可以将类型声明为 ReactiveCommand,
     public ReactiveCommand ResetCommand => this.resetCommand;
 
     public string UserName

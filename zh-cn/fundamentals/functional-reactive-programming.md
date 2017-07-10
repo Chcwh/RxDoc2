@@ -1,26 +1,26 @@
-# Functional Reactive Programming
+# 函数响应编程
 
-Functional. Reactive. Programming. What on Earth is that?
+函数响应编程到底是什么？
 
-Well, we know to some degree what functional programming is. Functions don't have side-effects; there's no mutable state. It's a difficult way to program since the real world is mutable. Modeling things like user input becomes a nightmare.
+某种程度上我们知道函数编程是什么。函数没有副作用，没有可变状态。但是真实世界是可变的，编程因此也变得困难。建模用户输入成为了一项噩梦。
 
-*Reactive* programming? What's that? Well, the best way to describe reactive programming is to think of a spreadsheet. Imagine three cells, A, B, and C. A is defined as the sum of B and C. Whenever B or C changes, A *reacts* to update itself. That's reactive programming: changes propagate throughout a system automatically.
+*响应* 编程是什么？ 比如说有一个电子表格，有三个单元格 A, B, 和 C。 A 是 B 和 C 的和。每当 B 或 C 改变时， A *自动* 更新自己。这就是响应式编程：变化在系统中自动传播。
 
-Functional reactive programming is just a combination of functional and reactive paradigms. We model user input as a function that changes over time, abstracting away the idea of mutable state.
+函数响应编程只是函数化和响应编程的结合。
 
 Functional reactive programming is the peanut butter and chocolate of programming paradigms.
 
 ## Signals
 
-At the core of functional reactive programming is a signal. A signal is a rather abstract concept, and it's easier to describe what a signal does rather than what it is. A signal simply sends values over time. It sends values until it either completes, or errors out, at which point it stops sending values forever. A signal either completes or errors out, but not both.
+函数响应编程的核心是信号。信号是一个相当抽象的概念，描述信号的作用比描述它是什么更容易。一个信号随着时间自动发送值，一直发送，直到完成或者发生错误并永远终止。信号最终会完成或出错终止，不会同时发生。
 
-Signals have no sense of a "current value" or "past values" or "future values", they are very simple. They just *send values over time*. Signals become useful when they're subscribed to or used with bindings, both of which we'll cover shortly. For now, it's important to understand that a signal can be *transformed*.
+信号没有“当前值”，“过去值”，“未来值”的概念，它们非常简单。他们只是 *随着时间发送值* 。当它们被订阅或在绑定中用到时，才变得有用。重要的是，要懂得信号可以 *被转换*。
 
-If I have a signal that sends numbers, and I want it to send strings instead, I can easily *transform* that signal with a *map*. A map is an *operator* that takes in a signal as a receiver, performs some operation on the values sent over that signal, and generates a new signal with the new, mapped values.
+如果有一个发送数字的信号，我希望它发送字符串，就可以使用 *map* 轻松的 *转换* 信号。map 是一个 *运算符* ，其需要一个信号作为输入，在值上面做一些操作，生成一个新的信号，发送转换后的值。
 
-A signal can be *subscribed to* in order to perform side-effects. A good example would be the signal emitted by a button when it's pressed; we can subscribe to that signal in order to perform side effects. A signal can also be *bound* to a property. For example, a signal that sends the location of a gesture recognizer can be mapped to a color and bound to the background color of a view. Then, when the user changes their tap position, the view changes color.
+信号可以 *被订阅* 。比如说当一个按钮被按下时发出的信号，可以订阅这个信号，然后做一些操作。信号也可以 *被绑定* 到属性。比如说发送手势识别器位置的信号可以映射到颜色，并绑定到视图的背景色。然后，当用户改变触摸的位置时，视图改变颜色。
 
-Both of these examples, of subscription and binding, demonstrate that we can create a set up at the beginning of an application run-time and tell the code *what to do* without telling it *how to do it*. This is the value of functional reactive programming.
+订阅和绑定的例子，都表明了在应用程序初始化的时候，告诉代码 *做什么* ，而不是 *怎么做* 。这就是函数响应编程的价值所在。
 
 Another core concept in functional reactive programming is that of *derived* state. State is OK in ReactiveUI, as long as it's *bound* to a signal. This derived state means that you never explicitly set the value of a bound property, but rather rely on signal transformations to derive that state for you.
 

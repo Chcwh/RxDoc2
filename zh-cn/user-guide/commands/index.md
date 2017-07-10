@@ -1,11 +1,11 @@
 # Commands
 
-Commands encapsulate logic to be executed in response to some user action. Examples of actions are clicking a **Save** menu item, tapping a phone icon, or stretching an image. Respectively, the associated logic might be to save outstanding changes, instigate a phone call, or zoom into the image.
+命令封装了响应某些用户操作的执行逻辑。比如说点击 **保存** 菜单，触摸手机图标，或拉伸图片。相应地，相关的逻辑可能是保存未完成的更改，启动电话或放大图像。
 
-Commands may or may not be executable in a given situation. For example, the command backing the **Save** menu item might be unavailable if there are no unsaved changes.
+命令在指定条件下可以或不可以执行。比如**保存**菜单在没有未保存的更改时，就应该不可用。
 
-In MVVM, the view model does not concern itself with *how* a user executes a particular command - that decision is left to the view. But typically it's best if the execution logic resides in the view model so that changes to the view model's state can be encapsulated. Commands facilitate this separation between the *how* and the *what*.
+在MVVM中，视图模型不关心用户如何执行特定命令 - 该决定留给视图。 但是通常情况下最好是将执行逻辑保留在视图模型中，这样就可以封装对视图模型状态的更改。 命令提高了**如何做**和**做什么**之间的距离。
 
-If you've done any UI development in .NET, you're likely familiar with [the `ICommand` interface](https://msdn.microsoft.com/en-us/library/system.windows.input.icommand.aspx). It is an abstraction that can be used for exactly the purposes described. Its `CanExecute` method can be used to determine whether a command can be executed. If so, one can then invoke the `Execute` method. The `CanExecuteChanged` event can be used by interested parties to know when the command's executability has changed. For example, a `Button` bound to a particular `ICommand` would want to update its enabled state based on the executability of the command.
+如果你在 .NET 下做了 UI 开发，你可能对 [`ICommand` 接口](https://msdn.microsoft.com/en-us/library/system.windows.input.icommand.aspx) 比较熟悉。 这是一个可以用于所描述的目的的抽象。 其 `CanExecute` 方法可用于确定是否可以执行命令。 如果为真，就可以调用 `Execute` 方法。 `CanExecuteChanged` 事件可以由有关方使用，以知道命令的可执行性已经改变。 例如，绑定到特定 `ICommand` 的 `按钮` 将根据命令的可执行性来更新其启用状态。
 
-But the `ICommand` interface isn't an ideal abstraction. It fails to elegantly accommodate long-running commands, such as those that perform I/O. Moreover, its interface is imperative, not reactive. This makes it far less amenable to a reactive code base.
+但是 `ICommand` 接口不是一个理想的抽象。它不能优雅地适应长时间运行的命令，例如执行 I/O 的命令。 而且，它的界面是必不可少的，而不是响应式的。 这使得它远不如适用于反应式代码库。
