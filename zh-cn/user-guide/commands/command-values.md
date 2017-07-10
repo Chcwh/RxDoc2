@@ -1,32 +1,32 @@
-# Command Values
+# 返回值
 
-The execution of a command produces a value, which is captured as `TResult` in `ReactiveCommand<TParam, TResult>`. If you don't need to return anything special, you can just use `Unit` for `TResult`. Indeed, this is what will happen automatically if you use `Create*` overloads that don't return values:
+命令的执行会产生返回值，其类型由 `ReactiveCommand<TParam, TResult>` 中的 `TResult` 指定。如果不需要返回值，那么将 `TResult` 指定为 `Unit`。实际上，在使用创建 `Create*` 重载创建没有返回值的命令时，会自动发生：
 
 ```cs
-// a synchronous command that does not return an interesting result
+// 没有返回值的同步命令
 var command1 = ReactiveCommand.Create(() => { });
 
-// an observable-based asynchronous command that does not return an interesting result
+// 基于可观察对象的，没有返回值的异步命令
 var command2 = ReactiveCommand.CreateFromObservable(() => Observable.Return(Unit.Default));
 
-// a Task-based asynchronous command that does not return an interesting result
+// 基于Task，没有返回值的异步命令
 var command3 = ReactiveCommand.CreateFromTask(async () => await Task.Delay(TimeSpan.FromSeconds(2)));
 ```
 
-All the above commands are of type `ReactiveCommand<Unit, Unit>`. Note that `CreateFromObservable` is required to eventually return an `IObservable<T>`, so `T` must be known. Therefore, to get a `ReactiveCommand<Unit, Unit>` from `CreateFromObservable`, you must ensure your observable is of type `IObservable<Unit>`.
+上面的所有命令的类型都是 `ReactiveCommand<Unit, Unit>` 。注意 `CreateFromObservable` 最终需要返回一个 `IObservable<T>`，因此必须指定 `T` 。这样的话，要用 `CreateFromObservable` 创建一个 `ReactiveCommand<Unit, Unit>` ，必须确保可观察对象的类型是 `IObservable<Unit>`。
 
-If you _do_ want to return something interesting each time your command executes, you need only use the appropriate `Create*` method:
+如果想创建能够返回值的命令，只需要使用适当的 `Create*` 方法：
 
 ```cs
-// a synchronous command that always returns 42 upon execution
+// 执行后总是返回 42 的同步命令
 var command1 = ReactiveCommand.Create(() => 42);
 
-// an observable-based asynchronous command that always returns 42 upon execution
+// 基于可观察对象的，执行后总是返回 42 的同步命令
 var command2 = ReactiveCommand.CreateFromObservable(() => Observable.Return(42));
 
-// a Task-based asynchronous command that always returns 42 upon execution
+// 基于Task，执行后总是返回 42 的同步命令
 var command3 = ReactiveCommand.CreateFromTask(() => Task.FromResult(42));
 ```
 
-Here, all commands are of type `ReactiveCommand<Unit, int>`. Subscribing to the observable return by `Execute` will tick through the value `42`.
+这里，所有的命令的类型都是 `ReactiveCommand<Unit, int>`。订阅 `Execute` 返回的可观察对象将会 tick through 值 `42`。
 

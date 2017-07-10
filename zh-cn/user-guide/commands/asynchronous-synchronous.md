@@ -1,31 +1,28 @@
-## Asynchronous versus Synchronous Commands
+## 异步 VS 同步
 
-Even though the API presented by `ReactiveCommand` is asynchronous, you are not required to perform your execution logic asynchronously. If your command is not CPU-intensive or I/O-bound then it probably makes sense to provide synchronous execution logic. You can do so by creating a command via `ReactiveCommand.Create`:
+尽管 `ReactiveCommand` 提供的 API 是异步的，也不需要异步执行执行逻辑。 如果您的命令不是 CPU 密集型或基于 I/O，则提供同步执行逻辑可能是有意义的。可以通过 `ReactiveCommand.Create` 创建命令：
 
 ```cs
 var command = ReactiveCommand.Create(() => Console.WriteLine("a synchronous reactive command));
 ```
 
-There are several overloads of `Create` to facilitate commands that take parameters or return interesting values when they execute. These will be discussed in more detail below.
+有几个 `Create` 能够创建需要参数或能返回值的命令。这将在后文详细讨论。
 
-If, on the other hand, your command's logic _is_ CPU- or I/O-bound, you'll want to use `CreateFromObservable` or `CreateFromTask`:
+另一方面，如果命令逻辑是 CPU 或 I/O 阻塞的话，需要使用 `CreateFromObservable` 或 `CreateFromTask`：
 
 ```cs
-// here we're using observables to model asynchrony
+// 这里使用可观察对象模拟异步
 var command1 = ReactiveCommand.CreateFromObservable(() => Observable.Return(Unit.Default).Delay(TimeSpan.FromSeconds(3)));
 
-// here we're using the TPL to model asynchrony
+// 这里使用 TPL 模拟异步
 var command2 = ReactiveCommand.CreateFromTask(async () =>
     {
         await Task.Delay(TimeSpan.FromSeconds(3)); 
     });
 ```
 
-Again, several overloads exist for commands taking parameters and returning values.
+同样，这两个方法也有重载可以创建需要参数或能返回值的命令。
 
-Regardless of whether your command is synchronous or asynchronous in nature, you execute it via the `Execute` method. You get back an observable that will tick the command's result value when execution completes. Synchronous commands will execute _immediately_, so the observable you get back will already have completed. The returned observable is behavioral though, so subscribing after the fact will still tick through the result value.
+无论命令是同步还是异步的，都可以通过 `Execute` 来执行。然后获得一个能在执行完成后 tick 命令结果的可观察对象。同步命令将会立即执行，因此获得的可观察对象已被完成。返回的可观察对象是 behavioral though，因此这之后订阅也能收到返回值。
 
-> **Warning** As is often the case with idiomatic Rx, the observable returned by `Execute` is cold. That is, nothing will happen unless something subscribes to it. This subscription is often instigated by the binding infrastructure. But in those cases where you're calling `Execute` directly, it's very important to remember that it's lazy.
-
-
-
+> **警告** 像 Rx 通常的一样，`Execute1 返回的可观察对象是冷的。 也就是说，除非有人订阅，否则什么都不会发生。 这种订阅通常是由绑定基础设施完成的。 但是在直接调用 `Execute` 的情况下，记住它很懒惰是非常重要的。
