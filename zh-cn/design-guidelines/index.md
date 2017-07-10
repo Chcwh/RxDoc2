@@ -1,12 +1,9 @@
-# Design Guidelines
+# 设计指南
 
-It can be tough to wrap your head around Reactive Extensions, and by extension ReactiveUI, when you start out. As with any new technology, there are some pitfalls you fall into as you learn. 
+在刚开始使用 Reactive Extensions，并延伸到 ReactiveUI 时，会有一些头疼的地方。与任何新技术一样，学习中都可能掉坑。
 
-Over time, GitHub has learned some hard lessons by failing over and over again as they built GitHub for Windows. All those failures are interspersed with an occasional nugget of success where they learned a better approach.
+随着时间的推移，GitHub 在构建 GitHub for Windows时，在一再失败中学到了沉重的教训。All those failures are interspersed with an occasional nugget of success where they learned a better approach.
 
-However, much of this knowledge was tribal in nature. Stories were linked to each other as reminders of what to do and what not to do. But that's fragile and doesn't help anyone else. 
+然而，这些知识大部分是零散的。 故事相互联系在一起，作为提醒，做什么和不做什么。 但这是脆弱的，并没有帮助任何人。
 
-GitHub has since released their design guidelines for building an application with ReactiveUI so there is a record of that tribal knowledge. This way others can benefit from what they learned, and they can benefit from what others learn.
-
-<img alt="GitHub for Windows" src="/images/design-guidelines/433d35cc-eb70-11e3-9d50-5dc4c1abc9a6.png">
-
+GitHub 已经发布了使用 ReactiveUI 构建应用程序的设计指南，因此有部分知识的记录。 这样，其他人可以从他们学到的东西中受益，他们可以从别人的学习中受益。

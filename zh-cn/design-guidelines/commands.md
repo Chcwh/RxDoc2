@@ -1,8 +1,8 @@
-# Commands
+# 命令
 
-Prefer binding user interactions to commands rather than methods.
+为用户界面绑定命令而不是方法
 
-## Do
+## 应该
 
 ```csharp
 // In XAML
@@ -22,9 +22,9 @@ public class RepositoryViewModel : ReactiveObject
 }
 ```
 
-## Don't
+## 不应该
 
-Use the Caliburn.Micro conventions for associating buttons and commands:
+使用 Caliburn.Micro 约定关联按钮和命令：
 
 ```csharp
 // In XAML
@@ -36,12 +36,11 @@ public class RepositoryViewModel : PropertyChangedBase
 }
 ```
 
-## Why?
+## 为什么？
 
-* ReactiveCommand exposes the `CanExecute` property of the command to 
-  enable applications to introduce additional behaviour.
-* It handles marshaling the result back to the UI thread.
-* It tracks in-flight items.
+* ReactiveCommand 公开了命令的 `CanExecute` 属性，让程序可以有更多的行为。
+* 自动将结果返回到 UI 线程。
+* 能够跟踪 in-flight 对象。.
 
 
 

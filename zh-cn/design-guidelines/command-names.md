@@ -1,14 +1,14 @@
-# Command Names
+# 命令名称
 
-Don't suffix `ReactiveCommand` properties' names with `Command`; instead, name the property using a verb that describes the command's action. For example:
+不要为 `ReactiveCommand` 属性加上 `Command` 后缀；而是使用一个能够描述命令动作的动词命名属性。比如说：
 
 ```csharp
 public ReactiveCommand Synchronize { get; private set; }
 
-// and then in the ctor:
+// 在构造函数里面：
 Synchronize = ReactiveCommand.CreateAsyncObservable(
   _ => SynchronizeImpl(mergeInsteadOfRebase: !IsAhead));
 
 ```
 
-When a `ReactiveCommand`'s implementation is too large or too complex for an anonymous delegate, name the implementation's method the same name as the command, but with `Impl` suffixed (for example, `SychronizeImpl` above).
+在 `ReactiveCommand` 的实现太长或太复杂，不适合作为匿名委托的时候，为实现的方法取其命令相同的名称，但是加上 `Impl` 后缀（例如上面的 `SychronizeImpl`）。

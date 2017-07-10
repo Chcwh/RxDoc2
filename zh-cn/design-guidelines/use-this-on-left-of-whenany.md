@@ -1,6 +1,6 @@
-# Almost always use `this` as the left hand side of a `WhenAny` call.
+# 总是在 `WhenAny` 调用的左边使用 `this`
 
-## Do
+## 可以
 ```csharp
 public class MyViewModel
 {
@@ -24,7 +24,7 @@ public class MyViewModel
 }
 ```
 
-## Don't
+## 不可以
 ```csharp
 public class MyViewModel(IDependency dependency)
 {
@@ -33,6 +33,5 @@ public class MyViewModel(IDependency dependency)
 }
 ```
 
-## Why?
-* The lifetime of `dependency` is unknown - if it is a singleton it
- could introduce memory leaks into your application.
+## 为什么
+* `dependency` 的生命周期是未知的 - 如果是单例的话，会导致内存泄露。

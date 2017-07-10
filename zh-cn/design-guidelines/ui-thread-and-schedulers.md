@@ -1,23 +1,24 @@
-# UI Thread and Schedulers
-Always make sure to update the UI on the `RxApp.MainThreadScheduler` to ensure UI  changes happen on the UI thread. In practice, this typically means making sure to update view models on the main thread scheduler.
+# UI 线程和调度器
 
-## Do
+确保总是在 `RxApp.MainThreadScheduler` 上更新 UI，以保证 UI 在 UI 线程上产生变化。在实践中，就是确保在主线程调度器上更新视图模型。
+
+## 可以
 ```csharp
 FetchStuffAsync()
   .ObserveOn(RxApp.MainThreadScheduler)
   .Subscribe(x => this.SomeViewModelProperty = x);
 ```
 
-## Better
-Even better, pass the scheduler to the asynchronous operation - this is often
-necessary for more complex tasks.
+## 更好
+
+更好的是，将调度程序传递给异步操作 - 这对于更复杂的任务通常是必需的。
 
 ```csharp
 FetchStuffAsync(RxApp.MainThreadScheduler)
   .Subscribe(x => this.SomeViewModelProperty = x);
 ```
 
-## Don't
+## 不可以
 ```csharp
 FetchStuffAsync()
   .Subscribe(x => this.SomeViewModelProperty = x);

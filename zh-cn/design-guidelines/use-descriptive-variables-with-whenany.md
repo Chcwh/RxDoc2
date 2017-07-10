@@ -1,7 +1,7 @@
-# Use descriptive variables in your `WhenAny`
-In situations where you are detecting changes in multiple expressions, ensure you name the variables in the `selector` 
+# 在 `WhenAny` 中使用描述性变量
+在多条件下检测变化时，在 `selector` 中确保变量的名称
 
-## Do
+## 可以
 ```csharp
 public class MyViewModel : ReactiveObject
 {
@@ -18,7 +18,7 @@ public class MyViewModel : ReactiveObject
 }
 ```
 
-## Don't
+## 不可以
 ```csharp
 public class MyViewModel : ReactiveObject
 {
@@ -35,5 +35,5 @@ public class MyViewModel : ReactiveObject
 }
 ```
 
-## Why?
-This helps greatly with the readability of complex expressions, particularly when working with boolean values.
+## 为什么
+显著提高复杂表达式的可读性，特别是处理布尔值的时候。

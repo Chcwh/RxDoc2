@@ -1,4 +1,4 @@
-# Dispose your subscriptions
+# 销毁订阅
 
 http://www.introtorx.com/content/v1.0.10621.0/03_LifetimeManagement.html
 
@@ -11,7 +11,7 @@ this.WhenActivated(
     });
 ```
 
-See also https://docs.reactiveui.net/en/user-guide/when-activated/
+还有 https://docs.reactiveui.net/en/user-guide/when-activated/
 
 
-Not _all_ subscriptions need to be disposed. It's like events. If a component exposes an event and also subscribes to it itself, it doesn't need to unsubscribe. That's because the subscription is manifested as the component having a reference to itself. Same is true with Rx. If you're a VM and you e.g. `WhenAnyValue` against your own property, there's no need to clean that up because that is manifested as the VM having a reference to itself.
+注意所有的订阅都需要销毁。就和事件一样。如果一个组件公开一个事件，并自己订阅，是不需要解除订阅的。因为订阅表现为组件拥有自己的引用。Rx 也是一样。如果一个视图模型通过诸如 `WhenAnyValue` 的方式与自己的属性关联，是不需要清理的，因为这表现为视图模型拥有自己的引用。
