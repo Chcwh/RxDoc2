@@ -1,11 +1,12 @@
-## Command Errors
+## 命令错误
 
-If the logic you provide to a `ReactiveCommand` can fail in expected ways, you need a means of dealing with those failures.
+如果您提供给 `ReactiveCommand` 的逻辑可能会以预期的方式失败，则需要处理这些故障的方法。
 
-For command execution, the pipeline you get back from `Execute` will tick any errors that occur in your execution logic. However, the subscription to this observable is often instigated by the binding infrastructure. As such, it's likely that you cannot even get a hold of the observable to observe any errors.
+对于命令执行，从 `Execute` 返回的管道将会 tick 执行逻辑中出现的任何错误。然而，对可观察对象的订阅往往是由绑定基础设施完成的。因此，您甚至无法获得可观察对象来观察任何错误。
 
-To address this dilemma, `ReactiveCommand` includes a `ThrownExceptions` observable (of type `IObservable<Exception>`). Any errors that occur in your execution logic will *also* tick through this observable. If you haven't subscribed to it, ReactiveUI will bring down your application. This forces you towards a pit of error-handling success.
+为了解决这个困境，`ReactiveCommand` 包含一个 `ThrownExceptions` 可观察对象（类型为 `IObservable <Exception>`）。执行逻辑中发生的任何错误 *也
+* 会通过这个可观察对象 tick trough。如果没有进行订阅，那么 `ReactiveUI` 将会关闭应用程序。这迫使你必须进行错误处理。
 
-It can be tempting to *always* add a subscription to `ThrownExceptions`, even if the only recourse is to just log the problem. However, it is advisable to treat this like any other exception handling and only handle problems you can redress. If, for example, your command merely updates a property in your view model and it should never fail, any subscription to `ThrownExceptions` will serve only to obscure implementation problems. That said, be aware of the potential for intermittent problems, such as network and I/O errors. As always, a strong suite of tests will help you identify where a subscription to `ThrownExceptions` makes sense.
+ *总是* 添加一个 `ThrownExceptions` 的订阅可能是诱人的，即使唯一的追索是只是记录问题。但是，建议像处理任何其他异常处理一样，只处理您可以解决的问题。例如，如果你的命令只是更新视图模型中的一个属性，并且它永远不会失败，任何对 `ThrownExceptions` 的订阅都只会使问题变得模糊。也就是说，要注意网络和I/O错误等间歇性问题的可能性。一如以往，强大的测试将帮助搞清楚在哪里订阅 `ThrownExceptions` 有意义。
 
-> **Note** Your `canExecute` pipeline also has the potential to produce an error. Such cases are almost certainly a programmer error because you never want your `canExecute` pipeline to end in error. Even so, these errors will also tick through `ThrownExceptions`.
+>**注意** 您的 `canExecute` 管道也有可能产生错误。这样的情况几乎肯定是一个程序员的错误，因为你绝不希望你的 `canExecute` 管道以错误结束。即使如此，这些错误也将通过 `ThrownExceptions` 进行tick。
