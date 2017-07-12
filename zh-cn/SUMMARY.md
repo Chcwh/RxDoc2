@@ -15,6 +15,7 @@
   * [Xamarin Studio 设置](getting-started/xamarin-studio-settings.md)
   * [调试符号](getting-started/debugging-symbols.md)
   * [例子](getting-started/example.md)
+  * [例子](getting-started/example.md)
 * [例子](https://github.com/reactiveui/samples)
 * [用户指导](user-guide/index.md)
   * [WhenAny](user-guide/when-any/index.md)

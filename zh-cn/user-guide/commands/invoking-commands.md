@@ -1,6 +1,6 @@
-# Invoking Commands
+# 调用命令
 
-At times it can be convenient to execute a command in response to some observable that isn't perhaps tied to a user interaction. For example, a feature that automatically saves the current document by executing a `SaveCommand` every 5 minutes. The `InvokeCommand` extension makes it easy to achieve this:
+有时候想方便的在没有观察到用户交互的情况下执行一命令。比如，通过每5分钟自动执行一次 `SaveCommand` 。`InvokeCommand` 扩展可以轻易的实现：
 
 ```cs
 var interval = TimeSpan.FromMinutes(5);
@@ -9,4 +9,4 @@ Observable
     .InvokeCommand(this.ViewModel, x => x.SaveCommand);
 ```
 
-> **Hint** `InvokeCommand` respects the command's executability. That is, if the command's `CanExecute` method returns `false`, `InvokeCommand` will not execute the command when the source observable ticks.
+> **提示** `InvokeCommand` 遵循命令的可执行性。就是说，如果命令的 `CanExecute` 返回 `false`，`InvokeCommand` 不会在可观察对象 tick 的时候执行命令。

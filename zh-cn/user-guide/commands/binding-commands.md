@@ -1,18 +1,18 @@
-# Binding
+# 绑定
 
-Once you have created a command and exposed it from your view model, the next logical step is to consume it from your view. The most common means of achieving this is via the `BindCommand` method. This method - of which there are several overloads - is responsible for tying any source `ICommand` to a target control. Typical usage looks like this:
+一旦创建了命令，并在视图模型上公开，那么下一步就是在视图上使用了。通常通过 `BindCommand` 方法来完成。该方法有几个重载，可以绑定任何 `ICommand` 源到目标控件。典型用法如下：
 
 ```cs
-// in a view
+// 在视图中
 this.BindCommand(
     this.ViewModel,
     x => x.MyCommand,
     x => x.myControl);
 ```
 
-Here we bind the `myControl` control to the `MyCommand` command exposed by our view model. What happens next is contingent upon any `ICreatesCommandBinding` instances registered in the [service locator](http://docs.reactiveui.net/en/user-guide/dependency-injection/index.html). However, normally `myControl` will be disabled whenever the command is unavailable. In addition, performing some default action against `myControl` will execute the command. For example, if `myControl` is a button, the required action would be a click (or tap).
+这里将 `myControl` 控件绑定到视图模型上公开的 `MyCommand` 命令。接下来发生的事情就取决于 [service locator](http://docs.reactiveui.net/en/user-guide/dependency-injection/index.html) 中注册的 `ICreatesCommandBinding` 实例了。无论如何，通常情况下会在命令不可用的时候禁用 `myControl` 。另外，会在 `myControl` 发生某些默认行为的时候执行命令。比如，如果 `myControl` 是按钮，所需的行为就是一个点击（或触摸）。
 
-> **Note** The above example shows a naked call to `BindCommand`, but it will often be performed inside a `WhenActivated` block:
+> **注意** 上面只是单独调用 `BindCommand`。通常情况下会放到 `WhenActivated` 块中：
 > 
 > ```cs
 > this.WhenActivated(
@@ -25,9 +25,9 @@ Here we bind the `myControl` control to the `MyCommand` command exposed by our v
 >     });
 > ```
 > 
-> Please see [the documentation on `WhenActivated`](http://docs.reactiveui.net/en/user-guide/when-activated/index.html) for more information.
+> 更多内容，查阅 [关于 `WhenActivated` 的文档](http://docs.reactiveui.net/en/user-guide/when-activated/index.html) 。
 
-The form of `BindCommand` demonstrated above does not provide any hint as to which event instigates command execution. Hence, a default event will be used (such as `Click` or `Tapped`). If, on the other hand, you want to tie your command's execution to some event other than the default, you can use an overload of `BindCommand` that takes an event name:
+`BindCommand`所演示的这种方式，没有关于将会在那个事件上执行命令的信息。因此将使用默认事件（例如点击或触摸）。另一方面，如果想要将命令的执行与默认事件之外的事件关联，可以使用 `BindCommand` 的重载：
 
 ```cs
 this.BindCommand(
@@ -37,12 +37,12 @@ this.BindCommand(
     nameof(myControl.SomeEvent));
 ```
 
-Here, the `SomeEvent` on `myControl` will be used to trigger command execution instead of the default event.
+然后，`myControl` 的 `SomeEvent` 将会用于触发命令执行了。
 
-Finally, `BindCommand` also provides overloads that allow you to specify a parameter with which to execute the command. The parameter can be provided as a function, an observable, or even an expression that resolves a property on the view model:
+最后，`BindCommand` 的重载允许提供用于执行命令的参数。该参数可以由一个函数、可观察对象甚至是表达式：
 
 ```cs
-// pass through an execution count as the command parameter
+// 使用执行计数作为参数
 var count = 0;
 this.BindCommand(
     this.ViewModel,
@@ -50,7 +50,7 @@ this.BindCommand(
     x => x.myControl,
     () => count++);
 
-// use an observable as the source for command parameters
+// 使用可观察对象作为参数
 IObservable<int> param = ...;
 this.BindCommand(
     this.ViewModel,
@@ -58,7 +58,7 @@ this.BindCommand(
     x => x.myControl,
     param);
 
-// use a property on the VM as a command parameter
+// 使用视图模型上的某个属性作为参数
 this.BindCommand(
     this.ViewModel,
     x => x.MyCommand,

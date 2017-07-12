@@ -1,6 +1,6 @@
-## Combined Commands
+## 组合命令
 
-At times it can be useful to have several commands aggregated into one. As an example, consider a browser that allows the user to clear individual caches \(browsing history, download history, cookies\), or clear all caches. There would be a command for clearing each individual cache, each of which might have its own logic to dictate the executability of the command. It would be onerous and error-prone to have to repeat or combine all this logic for the command that clears all caches. Combined commands provide an elegant means of addressing this situation:
+有时可以将多个命令聚合成一个。 例如，假如有一个允许用户清除各个缓存（浏览历史记录，下载历史记录，Cookie）或清除所有缓存的浏览器。 将有一个清除每个单独缓存的命令，每个缓存可能有自己的逻辑来指示命令的可执行性。 对于清除所有缓存的命令来说，重复或组合所有这些逻辑，不仅重复还容易出错。 组合命令提供了解决这种情况的优雅手段：
 
 ```cs
 IObservable<bool> canClearBrowsingHistory = ...;
@@ -18,13 +18,13 @@ var clearCookiesCommand = ReactiveCommand.CreateFromObservable(
     this.ClearCookies,
     canClearCookies);
 
-// combine all these commands into one "parent" command
+// 组合所有命令
 var clearAllCommand = ReactiveCommand
     .CreateCombined(
         new [] { clearBrowsingHistoryCommand, clearDownloadHistoryCommand, clearAllCommand });
 ```
 
-The combined command respects the executability of all child commands. That is, if any child command cannot currently execute, neither can the combined command. In addition, it is also possible for you to pass in _extra_ executability logic when creating your combined command:
+组合命令的可执行性取决于所有子命令的可执行性。就是说，如果任何一个子命令现在不能执行，那么组合命令也不能。另外，也可以添加额外的可执行性逻辑：
 
 ```cs
 IObservable<bool> canClearAll = ...;
@@ -34,9 +34,9 @@ var clearAllCommand = ReactiveCommand
         canClearAll);
 ```
 
-In this case, `clearAllCommand` will only be executable if all child commands are executable _and_ the latest value from `canClearAll` is `true`.
+在这种情况下，`clearAllCommand` 只会在所有子命令可执行且 `canClearAll` 的最新值为 `true` 的时候才能执行。
 
-> **Hint** All child commands provided to the `CreateCombined` method must be of the same type. You cannot combine, say, a `ReactiveCommand<Unit, Unit>` with a `ReactiveCommand<int, Unit>`. Nor can you combine, say, a `ReactiveCommand<Unit, Unit>` with a `ReactiveCommand<Unit, int>`. This is because all child commands will receive the parameter provided to the combined command, and the result of executing the combined command is a list of all child results.
+> **提示** `CreateCombined` 方法的所有命令的类型必须一致。不能组合诸如 `ReactiveCommand<Unit, Unit>` 与 `ReactiveCommand<int, Unit>`，`ReactiveCommand<Unit, Unit>` 与 `ReactiveCommand<Unit, int>`。这是因为所有的命令都会收到提供给组合命令的参数，且组合命令的返回值是所有子命令返回值的列表。
 
 
 
