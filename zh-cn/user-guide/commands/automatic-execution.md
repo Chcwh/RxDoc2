@@ -1,14 +1,15 @@
-# Automatic Execution
-Don't do it from the ViewModel, invoke from the View instead!
+# 自动执行
 
-See -> https://codereview.stackexchange.com/questions/74642/a-viewmodel-using-reactiveui-6-that-loads-and-sends-data
+不要在视图模型中进行，而是在视图中！
 
-The only thing I would change, is to not immediately call LoadItems.ExecuteAsyncTask in the ViewModel constructor. Invoking this in the VM constructor means that your VM class becomes more difficult to test, because you always have to mock out the effects of calling LoadItems, even if the thing you are testing is unrelated.
+详见 -> https://codereview.stackexchange.com/questions/74642/a-viewmodel-using-reactiveui-6-that-loads-and-sends-data
 
-Instead, I always call these commands in the View constructor, something like:
+唯一不同的是，不在视图模型的构造函数中直接调用 LoadItems.ExecuteAsyncTask 。在构造函数中调用意味着视图模型难以测试，因为总是模拟出了 LoadItems 
+
+作为替代，应该在视图的构造函数中调用，比如：
 
     this.WhenAnyValue(x => x.ViewModel.LoadItems)
         .SelectMany(x => x.ExecuteAsync())
         .Subscribe();
-        
-This means that any time we get a new ViewModel, we execute LoadItems, which is what we want when the app is running, but not what we want in every unit test.
+
+这就是说在任何取得新视图模型的情况下，会执行 LoadItems，这是我们所希望在程序运行时发生的，而不是在单元测试的时候。        
