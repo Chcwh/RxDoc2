@@ -1,25 +1,25 @@
-## Canceling
+## 取消
 
-If your command's execution logic can take a long time to complete, it can be useful to allow the execution to be canceled. This cancellation support can be used internally by your view models, or exposed so that users have a say in the matter.
+如果命令的执行需要很长的时间，允许执行可取消会很有用。取消支持可以仅用于视图模型内部，或者公开给用户。
 
-### Basic Cancelation
+### 基本方式
 
-At its most primitive form, canceling a command's execution involves disposing the execution subscription:
+最主要的方式，是通过销毁执行订阅取消命令的执行：
 
 ```cs
 var subscription = someReactiveCommand
     .Execute()
     .Subscribe();
 
-// this cancels the command's execution
+// 这会取消命令的执行
 subscription.Dispose();
 ```
 
-However, this requires you to obtain, and keep a hold of the subscription. If you're using bindings to execute your commands you won't have access to the subscription.
+但是，这需要取得并保存订阅。如果使用绑定执行命令，那就没办法了。
 
-### Canceling via Another Observable
+### 通过另一个可观察对象取消
 
-Rx itself has intrinsic support for canceling one observable when another observable ticks. It provides this via the `TakeUntil` operator:
+Rx 支持在另一个可观察对象 tick 的时候取消一个可观察对象。通过使用 `TakeUntil` 操作符：
 
 ```cs
 var cancel = new Subject<Unit>();
@@ -33,11 +33,11 @@ var command = ReactiveCommand
 // somewhere else
 command.Execute().Subscribe();
 
-// this cancels the above execution
+// 取消上面的执行
 cancel.OnNext(Unit.Default);
 ```
 
-Of course, you wouldn't normally create a subject specifically for cancellation. Normally you already have some other observable that you want to use as a cancellation signal. An obvious example is having one command cancel another:
+当然，可能不想就为了取消就创建 Subject。通常是已经有一个想用作取消信号的可观察对象了。典型的例子是有一个命令来取消另一个：
 
 ```cs
 public class SomeViewModel : ReactiveObject
@@ -69,15 +69,15 @@ public class SomeViewModel : ReactiveObject
 }
 ```
 
-Here we have a view model with a command, `CancelableCommand`, that can be canceled by executing another command, `CancelCommand`. Notice how `CancelCommand` can only be executed when `CancelableCommand` is executing.
+这里我们有一个视图模型，其中有一个命令 `CancelableCommand`，可以通过执行另一个命令 `CancelCommand` 来取消。 注意在 `CancelableCommand` 正在执行时，`CancelCommand` 才能执行。
 
-> **Note** At first glance there may appear to be an irresolvable circular dependency between `CancelableCommand` and `CancelCommand`. However, note that `CancelableCommand` does not need to resolve its execution pipeline until it is executed. So as long as `CancelCommand` exists before `CancelableCommand` is executed, the circular dependency is resolved.
+> **注意** 乍看之下，可能在 `CancelableCommand` 和 `CancelCommand` 之间可能会出现一个无法解决的循环依赖关系。 但是，请注意，`CancelableCommand` 在执行之前不需要解析其执行管道。 因此，只要 `CancelCommand` 在执行 `CancelableCommand` 之前就存在，循环依赖关系就被解决了。
 
-### Cancellation with the Task Parallel Library
+### 使用 TPL 来取消
 
-Cancellation in the TPL is handled with `CancellationToken` and `CancellationTokenSource`. Rx operators that provide TPL integration will normally have overloads that will pass you a `CancellationToken` with which to create your `Task`. The idea of these overloads is that the `CancellationToken` you receive will be canceled if the subscription is disposed. So you should pass the token through to all relevant asynchronous operations. `ReactiveCommand` provides similar overloads for `CreateFromTask`.
+TPL 中的取消由 `CancellationToken` 和 `CancellationTokenSource` 处理。 提供 TPL 集成的 Rx 运算符通常会有重载，允许在创建任务的时候传递一个 `CancellationToken`。 这些重载的想法是，如果订阅被销毁，您收到的 `CancellationToken` 将被取消。 所以你应该将令牌传递给所有相关的异步操作。 `ReactiveCommand` 为 `CreateFromTask` 提供了类似的重载。
 
-Consider the following example:
+请看例子：
 
 ```cs
 public class SomeViewModel : ReactiveObject
@@ -102,13 +102,13 @@ public class SomeViewModel : ReactiveObject
 }
 ```
 
-There are several important things to note here:
+有几个重点需要注意：
 
-1. Our `DoSomethingAsync` method takes a `CancellationToken`
-2. This token is passed through to `Task.Delay` so that the delay will end early if the token is canceled.
-3. We use an appropriate overload of `CreateFromTask` so that we have a token to pass through to `DoSomethingAsync`. This token will be automatically canceled if the execution subscription is disposed.
+1. `DoSomethingAsync` 方法需要一个 `CancellationToken`
+2. 该令牌传递给 `Task.Delay` ，因此如果令牌被取消的话，延迟会提前结束。
+3. 有一个 `CreateFromTask` 重载，因此可以给 `DoSomethingAsync` 传递令牌。该令牌会在执行订阅被销毁的时候自动取消。（自动创建令牌？）
 
-The above code allows us to do something like this:
+上面的代码还可以这样：
 
 ```cs
 var subscription = viewModel
@@ -116,13 +116,13 @@ var subscription = viewModel
     .Execute()
     .Subscribe();
 
-// this cancels the execution
+// 这会取消命令的执行
 subscription.Dispose();
 ```
 
-But what if we want to cancel the execution based on an external factor, just as we did with observables? Since we only have access to the `CancellationToken` and not the `CancellationTokenSource`, it's not immediately obvious how we can achieve this.
+但是，如果我们想要根据外部因素取消执行，就像我们对可观察性一样？ 既然我们只能访问 `CancellationToken` 而不是 `CancellationTokenSource`，那么我们如何才能实现，这一点并不明显。
 
-Besides forgoing TPL completely \(which is recommended if possible, but not always practical\), there are actually quite a few ways to achieve this. Perhaps the easiest is to use `CreateFromObservable` instead:
+除了完全使用 TPL（如果可能的话，建议，但不总是实用），实际上有很多方法可以实现。 也许最简单的方法是使用 `CreateFromObservable`：
 
 ```cs
 public class SomeViewModel : ReactiveObject
@@ -158,5 +158,5 @@ public class SomeViewModel : ReactiveObject
 }
 ```
 
-This approach allows us to use exactly the same technique as with the pure Rx solution discussed above. The difference is that our observable pipeline includes execution of TPL-based asychronous code.
+这种方法允许我们使用与上述纯 Rx 解决方案完全相同的技术。 区别在于我们的可观察流水线包含执行基于 TPL 的异步代码。
 

@@ -1,33 +1,32 @@
-# Interactions
+# 交互
+有时您可能会发现自己编写的视图模型代码需要用户确认某些内容。 例如，检查是否可以删除文件，或询问如何处理发生的错误。
 
-At times you may find yourself writing view model code that needs to confirm something with the user. For example, checking if it's OK to delete a file, or asking what to do about an error that has occurred.
+从视图模型中直接弹出一个消息框可能很方便。 但这是不正确的。 这不仅将您的视图模型与特定的 UI 技术联系起来，还使测试变得困难（甚至是不可能的）。
 
-It might be tempting to simply throw up a message box right from within the view model. But that would be a mistake. Not only does this tie your view model to a particular UI technology, it also makes testing difficult (or even impossible).
-
-Instead what is needed is a means of suspending the view model's execution path until some data is provided by the user. ReactiveUI's interaction mechanism facilitates just this.
+相反，需要的是一种挂起视图模型执行的手段，直到用户提供某些数据。 ReactiveUI 的交互机制可以做到这一点。
 
 ## API Overview
 
-Underpinning the interaction infrastructure is the `Interaction<TInput, TOutput>` class. This class provides the glue between collaborating components of the interaction. It is responsible for coordinating and distributing interactions to handlers.
+互动架构的基础是 `Interaction <TInput，TOutput>` 类。这个类提供了交互的协作组件之间的中介。它负责协调和分配与处理程序的交互。
 
-Interactions accept an input and produce an output. The input is something views can use when handling the interaction. The output is something that the view model gets back from the interaction. For example, imagine a view model that needs to ask the user whether a file can be deleted. To do so, it could pass the name of the file as the input, and get back a Boolean as the output, indicating whether the file can be deleted.
+交互接受输入并产生输出。输入是在处理交互时可以使用的视图。输出是视图模型从交互中返回的东西。例如，想象一个需要询问用户是否可以删除文件的视图模型。为此，它可以传递文件的名称作为输入，并返回一个布尔值作为输出，指示文件是否可以被删除。
 
-The input and output types for an interaction are entirely under your control. They are generalized by the `TInput` and `TOutput` generic type arguments to `Interaction<TInput, TOutput>`. As such, you are not at all restricted in what your interactions use as input, nor in what they produce as output.
+交互的输入和输出类型完全由您控制。它们 `Interaction <TInput，TOutput>` 的泛型类型参数 `TInput` 和 `TOutput` 推定。因此，并不严格限制的输入，也不管输出什么。
+ 
+> **注意** 有时可能不会关心输入类型。在这种情况下，可以使用 `Unit` 。也可以使用 `Unit` 作为输出类型，尽管这意味着您的视图模型没有使用交互作出决定。相反，它仅仅是通知即将要发生的事情。
 
-> **Note** There may be times you don't particularly care about the input type. In such cases, you can just use `Unit`. You can also use `Unit` as your output type, though this implies that your view model is not using the interaction to make a decision. Instead, it is merely informing the view that something is about to happen.
+交互处理程序接收到 `InteractionContext <TInput，TOutput>`。交互上下文通过 `Input` 属性暴露交互的输入。另外，它为处理程序提供了通过调用 `SetOutput` 方法提供交互输出的方法。
 
-Interaction handlers receive an `InteractionContext<TInput, TOutput>`. The interaction context exposes the input for the interaction via the `Input` property. In addition, it provides a means for handlers to supply the interaction's output by calling the `SetOutput` method.
+交互组件的常见配置：
 
-A typical arrangement of interaction components - one that has been assumed until now - is:
+* **视图模型**: 想知道问题的答案，比如“是否可以删除文件？”
+* **视图**: 询问问题，并在交互期间提供答案
 
-* **View Model**: wants to know the answer to a question, such as "is it OK to delete this file?"
-* **View**: asks the user the question, and supplies the answer during the interaction
+虽然这种配置最常见，但绝不是必需的。 例如，可以在没有用户干预的情况下将视图自己回答问题。 或者两个组件都是视图模型。 ReactiveUI 提供的交互架构不会对协作组件施加任何限制。
 
-Whilst this configuration is the most common, it is by no means required. You could, for example, have the view answer the question itself without user intervention. Or perhaps both components are view models. The interactions infrastructure provided by ReactiveUI does not place any restrictions on collaborating components.
+假设为常见配置，视图模型将创建并公开一个 `Interaction <TInput，TOutput>` 的实例。 相应的视图将通过调用其中一个 `RegisterHandler` 方法来注册一个处理这个交互的处理程序。 为了引发交互，视图模型将传入一个 `TInput` 的实例到 `Handle` 方法。 它将异步地接收到类型为 `TOutput` 的结果。
 
-Assuming the common configuration, a view model would create and expose an instance of `Interaction<TInput, TOutput>`. The corresponding view would register a handler against this interaction by calling one of the `RegisterHandler` methods on it. To instigate an interaction, the view model would pass in an instance of `TInput` to the `Handle` method. It would then asynchronously receive a result of type `TOutput`.
-
-## An Example
+## 例子
 
 ```cs
 public class ViewModel : ReactiveObject
@@ -45,7 +44,7 @@ public class ViewModel : ReactiveObject
     {
         var fileName = ...;
         
-        // this will throw an exception if nothing handles the interaction
+        // 如果没有东西处理交互，那么将会抛出异常
         var delete = await this.confirm.Handle(fileName);
         
         if (delete)
@@ -81,7 +80,7 @@ public class View
 }
 ```
 
-You can also create an `Interaction<TInput, TOutput>` that is shared across multiple components in your application. A common example of this is in error recovery. Many components may want to raise errors, but we may want only one common handler. Here's an example of how you can achieve this:
+也可以创建在多个组件间共享的 `Interaction<TInput, TOutput>`。一个常见的例子是错误恢复。 许多组件可能希望引发错误，但是我们可能只需要一个通用的处理程序。 举个例子：
 
 ```cs
 public enum ErrorRecoveryOption
@@ -147,25 +146,25 @@ public class RootView
 }
 ```
 
-> **Note** For the sake of clarity, the example code here mixes TPL and Rx code. Production code would normally stick with one or the other.
+> **注意** 为了清楚起见，这里的示例代码混合了 TPL 和 Rx 代码。 生产代码通常会只会使用一个。
 
-> **Warning** The observable returned by `Handle` is cold. You must subscribe to it for handlers to be invoked.
+> **警告** `Handle` 返回的可观察对象是冷的。必须对他进行订阅，以调用处理程序。
 
-## Handler Precedence
+## 成立程序优先级
 
-`Interaction<TInput, TOutput>` implements a handler chain. Any number of handlers can be registered, and later registrations are deemed of higher priority than earlier registrations. When an interaction is instigated with the `Handle` method, each handler is given the _opportunity_ to handle that interaction (i.e. set an output). The handler is under no obligation to actually handle the interaction. If a handler chooses _not_ to set an output, the next handler in the chain is invoked.
+`Interaction<TInput，TOutput>` 实现一个处理程序链。可以注册任何数量的处理程序，后注册的比先注册的更为优先。当使用` Handle` 方法启动交互时，每个处理程序都 _有机会_处理该交互（即设置一个输出）。处理程序没有义务实际处理交互。如果处理程序选择不设置输出，则链中的下一个处理程序将被调用。
 
-> **Note** The `Interaction<TInput, TOutput>` class is designed to be extensible. Subclasses can change the behavior of `Handle` such that it does not exhibit the behavior described above. For example, you could write an implementation that tries only the first handler in the list.
+> **注意** `Interaction<TInput，TOutput>` 类被设计为可扩展的。子类可以改变 `Handle` 的行为，使得它不会表现出上述行为。例如，您可以编写一个仅执行列表中第一个处理程序的实现。
 
-This chain of precedence makes it possible to define a default handler, and then temporarily override that handler. For example, a root level handler may provide default error recovery behavior. But a specific view in the application may know how to recover from a certain error without prompting the user. It could register a handler whilst it's activated, then dispose of that registration when it deactivates. Obviously such an approach requires a shared interaction instance.
+这个优先级链可以定义一个默认处理程序，然后暂时覆盖该处理程序。例如，根级别处理程序可以提供默认错误恢复行为。但是，应用程序中的具体视图可能会知道如何在不提示用户的情况下从某个错误中恢复。它可以在激活时注册一个处理程序，然后在停用时处理该注册。显然，这种方法需要共享交互实例。
 
-## Unhandled Interactions
+## 未处理的交互
 
-If there are no handlers for a given interaction, or none of the handlers set a result, the interaction is itself considered unhandled. In this circumstance, the invocation of `Handle` will result in an `UnhandledInteractionException<TInput, TOutput>` being thrown. This exception includes both an `Interaction` and `Input` property, so you can examine the details of the failed interaction.
+如果某个交互没有定义处理程序，或者所有的处理程序都没有设置输出，那么交互就没有被处理。在这种情况下，`Handle` 的调用将会引发 `UnhandledInteractionException` 异常。该异常包含了 `Interaction` 和 `Input` 属性，因此可以检查失败交互的详情。
 
-## Testing
+## 测试
 
-You can easily test interaction logic in view models by registering a handler for the interaction:
+通过为交互注册处理程序，可以轻易的测试交互逻辑：
 
 ```cs
 [Fact]
@@ -182,7 +181,7 @@ public async Task interaction_test()
 }
 ```
 
-If your test is hooking into a shared interaction, you probably want to dispose of the registration before your test returns:
+如果测试与某个共享的交互挂钩，那么在测试返回前，需要销毁注册：
 
 ```cs
 [Fact]
@@ -194,7 +193,7 @@ public async Task interaction_test()
     {
         fixture.SomeMethodAsync();
         
-        // assert abort here
+        // 断言在这里中止
     }
 }
 ```
