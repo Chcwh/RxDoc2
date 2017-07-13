@@ -53,7 +53,7 @@
       * [异步操作](user-guide/commands/asynchronous-operations.md)
       * [通用模式](user-guide/commands/common-patterns.md)
       * [单元测试](user-guide/commands/unit-testing.md)
-  * [Interactions](user-guide/interactions/index.md)
+  * [交互](user-guide/interactions/index.md)
   * [ObservableAsPropertyHelper](user-guide/observableaspropertyhelper/index.md)
   * [列表](user-guide/lists/index.md)
     * [派生列表](user-guide/lists/derived-lists.md)
