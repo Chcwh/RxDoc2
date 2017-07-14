@@ -1,20 +1,17 @@
-### Debugging Observables
+### 调试 Observable
 
-ReactiveUI has several helpers for debugging IObservables. The most
-straightforward one is `Log`, which logs events that happen to an Observable:
+ReactiveUI 有一些帮助类用于调试 IObservable。最简单的方法是 `Log`，可以记录 Observable 发生的异常：
 
 ```cs
-// Note: Since Log acts like another Rx operator like Select or Where,
-// it won't do anything by itself unless someone Subscribes to it.
+// 注意: 由于 Log 实际上和 Rx 操作符如 Select 或 Where 类似，
+// 所以在被订阅之前不会记录任何东西。
 this.WhenAny(x => x.Name, x => x.Value)
     .SelectMany(async x => GoogleForTheName(x))
     .Log(this, "Result of Search")
     .Subscribe();
 ```
 
-Another useful method to debug Observables is `LoggedCatch`. This method works
-identically to Rx's `Catch` operator, except that it also logs the exception
-to the Logger. For example:
+另一个用于调试 Observable 的方法是 `LoggedCatch`。这个方法做的工作和 Rx 的 `Catch` 操作符一样，除此之外还记录异常到记录器。例如：
 
 ```cs
 var userAvatar = await FetchUserAvatar()

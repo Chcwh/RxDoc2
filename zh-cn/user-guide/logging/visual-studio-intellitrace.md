@@ -1,23 +1,12 @@
 # Visual Studio IntelliTrace
 
-* Modify Visual Studio's IntelliTrace settings via Debug>IntelliTrace>Open
-   IntelliTrace Settings>IntelliTrace Events>Tracing> Check everything except
-   Assertion under tracing.  If you leave the default settings, you won't pick
-   up Debug level tracing - by checking all of the Trace events, you will pick
-   up Debug level messages.
+1. 修改 Visual Studio 的 IntelliTrace 设置， 通过 Debug>IntelliTrace>Open IntelliTrace Settings>IntelliTrace Events>Tracing> 选中除了 Assertion under tracing 之外的所有选项。如果保持默认设置，就不能获得 Debug 级别跟踪 —— 通过选中所有跟踪事件，可以获得 Debug 级别跟踪。
 
-* Make sure you have the `reactiveui-nlog` package installed to your unit test
-   assembly (unfortunately, you are out of luck if you are using a Windows
-   Store Test Library, but a "normal" unit test library works fine)
+1. 确保安装了 `reactiveui-nlog` 包到你的单元测试程序集（如果你使用 Windows Store Test Library 话，真是不幸；但是一个 “正常” 单元测试库没问题）
 
-* Add a file called nlog.config to your unit test project.  __Make sure you
-   set the "copy to output directory" property to "Copy if newer" or "Copy
-   always"__  If you leave the default action of "Do not copy" then the
-   nlog.config file won't be copied to your bin directory and nlog won't be
-   able to find its config file, which means it won't know to write to the
-   trace listener.
+1. 添加一个 nlog.config 文件到你的单元测试你项目。 ***确保你设置了 "复制到输出文件夹" 属性为 "如果较新则复制" 或 "总是复制" ***。如果是默认配置 "不复制"，那么 NLog 找不到配置文件，将不会知道要记录到跟踪监听器。
 
-* Here is the `nlog.config` file
+1. 这是 `nlog.config` 文件的内容
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -32,13 +21,12 @@
 </nlog>
 ```
 
-* Register NLogger at the start of your unit test with:
+1. 在单元测试的入口注册 NLogger ：
 
 ``` cs
-var logManager = Locator.Current.GetService<ILogManager>();
-Locator.CurrentMutable.RegisterConstant(logManager.GetLogger<NLogLogger>(),typeof(IFullLogger));   
+var logManager = RxApp.MutableResolver.GetService<ILogManager>();
+RxApp.MutableResolver.RegisterConstant(logManager.GetLogger<NLogLogger>(),typeof(IFullLogger));   
 ```
 
-*Hint: An easy way to filter the IntelliTrace view to only show ReactiveUI
-events is to type RxUI into the IntelliTrace window search box*
+*提示: 一个过滤 IntelliTrace 视图只显示 ReactiveUI 的事件的简单办法是，输入 RxUI 到 IntelliTrace 窗体的搜索框*
 
