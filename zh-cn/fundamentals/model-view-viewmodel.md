@@ -1,62 +1,64 @@
-# Model-View-ViewModel
+# 模型-视图-视图模型
 
-Model-View-ViewModel (MVVM for short) is usually described as:
+模型-视图-视图模型 （简称 MVVM） 通常是这样表述的：
 
-> a design pattern that is a variation of Martin Fowler's Presentation Model pattern which abstracts a view's state and behavior making view independent of any specific UI framework.
+> 一种设计模式，是 Martin Fowler 的 Presentation Model 模式的变体，其分离视图的状态和行为，使得视图独立与任何特定的 UI 框架。
 
-Since you are reading this document, chances are that above explanation is not all that helpful. **So, let us start again**.
+由于您正在阅读本文档，所以上面的解释不是很有帮助。**所以，让我们再来一次**。
 
-Model-View-ViewModel is a way to structure your application. It is an idea which helps you organize your classes and interactions between them. Note that MVVM is **not** a specific library or an API. Instead, it can be described as a [*way to define the architecture of an application*](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/). 
+模型-视图-视图模型是一种构建应用程序的方法。这个想法，可以帮助组织类和他们之间的交互。请注意，MVVM **不是**特定的库或 API。相反，它可以被描述为[*定义应用程序体系结构的一种方法*](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/)。
 
-There are lots of libraries and frameworks which use MVVM, or help you shape your program architecture in a MVVM manner. One of them is of course [ReactiveUI](http://reactiveui.net/). There are others, like for instance [MvvmCross](http://mvvmcross.com/), [MvvmLight](http://www.mvvmlight.net/), [Caliburn.Micro](http://caliburnmicro.com/) as well as [tons of others](https://www.nuget.org/packages?q=mvvm). All those libraries have one common goal - their purpose is to help you to split your UI and business code into maintainable pieces.
+有许多使用 MVVM 的库和框架，或者帮助您以 MVVM 的方式塑造您的程序体系结构。其中一个当然是 [ReactiveUI](http://reactiveui.net/)。还有其他的，例如 [MvvmCross](http://mvvmcross.com/)，[MvvmLight](http://www.mvvmlight.net/)，[Caliburn.Micro](http://caliburnmicro.com/) 以及[其他](https://www.nuget.org/packages?q=mvvm)。所有这些库都有一个共同的目标 - 其目的是帮助您将 UI 和业务代码分解成可维护的部分。
 
-The name of the Model-View-ViewModel pattern comes from three layers of an application. You can imagine them as a three separate bags, containing the bits of code from your application. In practice, this would mean the bits of code belonging to these layers are being stored inside different folders, namespaces, or even projects.
+模型-视图-视图模型模式的名称来自三层应用程序。您可以将它们设想为三个独立的部分，其中包含您应用程序中的一些代码。实际上，这意味着属于这些层的代码位将被存储在不同的文件夹，命名空间甚至项目中。
 
-## View
+## 视图
 
-Let's start with the most obvious one of the three. What belongs to the *View*? The answer is pretty simple - everything that is given to you by the specific UI framework you work with. 
+我们从三个中最明显的一个开始。什么属于 *视图* ？答案很简单 - 所特定 UI 框架相关的一切。
 
-All the user interface controls belong to the *View* layer. That includes buttons, input boxes, alert pop-ups, and that fancy calendar widget you hacked around recently.
+所有的用户界面控件属于 *视图* 层。这包括按钮，输入框，警报弹出窗口，以及最近被黑客攻击的那个花哨的日历窗口小部件。
 
-Note that in MVVM world, the word *View* has two meanings. We already mentioned the first one, which is a layer of your application. But *View* can also mean **a class that groups several logically connected user controls**.
+请注意，在 MVVM 世界中， *视图* 一词有两个含义。我们已经提到了第一个，这是你的应用程序层。但是 *视图* 也可以是**一个组合几个逻辑连接的用户控件的类**。
 
-This could be for example a `Page` class, if you develop in Xamarin. In WPF, this would be a `Window` class. For WinForms the class is called `Form`. You usually inherit from these classes and fill them with buttons, inputs and other useful elements. *View* classes' names usually correspond to their  functionality - like `LoginView` or `OrderCheckoutView`.
+这可以是一个 `Page` 类，如果你在 Xamarin 中开发的话。在 WPF 中，这将是一个 `Window` 类。对于 WinForms，该类称为 `Form` 。您通常从这些类继承，并用按钮，输入和其他有用的元素填充它们。*视图* 类的名称通常对应于它们的功能 - 如 `LoginView` 或 `OrderCheckoutView`。
 
-The important attribute of the *View* class is the fact that usually **it cannot be unit tested**.
+*Vi视图* 类的重要属性是通常**不能进行单元测试**的事实。
 
-Most UI frameworks have applied almost zero thought to unit testing when they were designed, or those concerns were deemed as out-of-scope. As a result, UI objects are often very difficult to test in unit test runners, as they are not just plain objects. They may have dependencies on a runloop existing, or often expect static classes / globals to be initialized in a certain way.
+大多数 UI 框架在设计时对单元测试几乎没有考虑，或者认为这些超出范围。因此，UI 对象通常非常难以在单元测试运行器中进行测试，因为它们不仅仅是简单的对象。它们可能具有依赖于现有的循环，或者通常期望以某种方式初始化静态类/全局变量。
 
-So, since UI classes are untestable, our new goal is to put as much of our interesting code into **a class that represents the *View*, but is just a regular class we can create**. Then, we want the actual code in the *View* to be as boring, mechanical, and as short as possible, because it is inherently untestable.
+所以，由于 UI 类是不可测试的，所以我们的新目标是把我们有趣的代码放入**代表 *视图* 的类中，但这只是一个我们可以创建的常规类**。然后，我们希望 *视图* 中的实际代码是无聊，机械的，并且尽可能的短，因为它本身是不可测的。
 
-This helpful class is called a *ViewModel*.
+这个有用的类称为 *ViewModel*。
 
-## ViewModel
-The somewhat confusing name of the *ViewModel* class comes from a fact that it is a *Model* of a *View*. This means, that you usually have one *ViewModel* per *View*. This doesn't have to be strictly true, but it is generally the case. For example, you will have a `LoginViewModel` for your `LoginView` etc.
+## 视图模型
 
-*ViewModel* classes expose data and actions that can be executed using UI of an application. Data is exposed to the *View* via public properties. The actions are simply methods of a *ViewModel*, wrapped in a so-called [`Command` classes](commands/index.md). Generally, commands allow you to enforce when the associated method of a *ViewModel* can be executed.
+*视图模型* 类这个略微令人困惑的名字来自于它是 *视图* 的 *模型* 的事实。这意味着通常每个 *视图* 都有一个 *视图模型* 。这不一定是严格的，但一般情况是这样的。例如，`LoginView` 将有一个`LoginViewModel` 等。
 
-The data and the commands are used by a *View* class associated with the *ViewModel*. Properties are read and written (e.g. in a textbox), while commands are usually executed when a user pushes a button. The mechanism that helps keep *View* and *ViewModel* state in sync is called [data binding](binding/index.md).
+*视图模型* 类公开可以被应用程序 UI 使用的数据和操作。数据通过公共属性暴露给 *视图* 。这些操作只是一个 *视图模型* 的方法，它被包含在所谓的[`命令`类](commands/index.md)中。通常，命令允许在执行 *视图模型* 的关联方法时执行。
 
-Another important aspect of *ViewModels* is that they are an abstraction to separate policy from mechanism. *ViewModels* do not deal in the specifics of Buttons and Menus and TextBoxes, they only describe how the data in these elements are related. For example, the *Copy* command has no direct knowledge of the MenuItem or the Button that it is connected to, it only models the *Action of Copying*. The View has the responsibility of mapping the *Copy* command to the controls that invoke it.
+数据和命令由与 *视图模型* 关联的 *视图* 类使用。属性被读取和写入（例如在文本框中），而通常在用户按下按钮时执行命令。有助于保持 *视图* 和 *视图模型* 状态同步的机制称为[数据绑定](binding/index.md)。
 
-Note that it is the *View* class which holds a reference to the *ViewModel*, not the other way round. In fact, the *View* is free to be very tightly bound to the *ViewModel*. 
+*视图模型* 的另一个重要方面是它们是将策略与机制分开的抽象。 *视图模型* 不涉及按钮和菜单和文本框的细节，它们只描述了这些元素中的数据是如何相关的。例如，*复制* 命令没有直接了解与它连接的菜单项或按钮，它只对 *复制操作* 进行建模。 *视图* 有责任将 *复制* 命令映射到调用它的控件。
 
-The fact that **the *ViewModel* does not reference the *View*** has profound consequences. Because *ViewModels* do not explicitly reference UI frameworks or controls, they can be **reused across platforms**. For instance, you can use the same *ViewModels* for your Xamarin and WPF application.
+请注意， *视图* 类持有对 *视图模型* 的引用，而不是相反。事实上， *视图* 可以自由地与 *视图模型* 紧密绑定。
 
+*视图模型不引用视图的事实* 有很好的效果。因为 *视图模型* 没有明确引用 UI 框架或控件，它们可以 *跨平台重用* 。例如，您可以对 Xamarin 和 WPF 应用程序使用相同的视图模型。
 
-All the *ViewModel* classes combined constitute a *ViewModel* layer of you application.
+所有 *视图模型* 类合在一起构成应用程序的 *视图模型* 层。
 
-## Model
-The last layer of you application is called a *Model*. Once you know what *View* and *ViewModel* is all about, this one is simple to define. Basically, it is all that is left. This includes, but is not limited to:
-- configuration classes
-- REST API wrappers
-- database repositiories
-- etc.
+## 模型
 
-*Model* classes usually serve as a source of data for your ViewModels. They are often injected in the constructor.
+应用程序的最后一层叫做 *模型* 。一旦知道了 *视图* 和 *视图模型* 是什么，*模型* 也就很容易理解了。基本上就是剩下的那些。包括，但不限于：
+- 配置类
+- REST API 包装器
+- 数据库访问
+- 等等
 
-## Additional reading
-There are lots of good introductory material to the MVVM pattern around the web. If you need more information, check out the [great introductory article written by qmatteoq](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/). You will also enjoy [this entertaining piece by Jeremiah Morrill ](http://jmorrill.hjtcentral.com/Home/tabid/428/EntryId/433/Anatomy-of-an-MVVM-Application-or-How-Tards-Like-Me-Make-MVVM-Apps.aspx).
+*模型* 类通常作为视图模型的数据源。通常在构造函数中注入。
+
+## 扩展阅读
+
+网上有许多关于 MVVM 的介绍材料。如果需要，可以阅读 [great introductory article written by qmatteoq](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/) 。也许会喜欢 [this entertaining piece by Jeremiah Morrill ](http://jmorrill.hjtcentral.com/Home/tabid/428/EntryId/433/Anatomy-of-an-MVVM-Application-or-How-Tards-Like-Me-Make-MVVM-Apps.aspx).
 
 ## All other articles on MVVM I have seen had diagrams included. Can I get one?
 

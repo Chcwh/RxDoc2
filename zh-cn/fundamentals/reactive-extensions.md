@@ -1,42 +1,44 @@
-The [official website](http://reactivex.io/intro.html) of Reactive Extensions (often called ReactiveX) provides a well worded summary of the library:
+Reactive Extensions 的[官方网站](http://reactivex.io/intro.html) （通常称为 ReactiveX ）对该库提供了一个很好的总结：
 
-> ReactiveX is library for composing asynchronous and event-based programs by using observable sequences and LINQ-style query operators.
+> ReactiveX 是一个将基于事件的程序异步化的库， 通过使用可观察序列和 LINQ 式查询运算符。
 
-We will break down this very dense explanation (actually, it could fit in a tweet!), and discuss point by point how the features of the library are useful while programming user interfaces.
+我们将分解这个非常密集的解释（实际上，it could fit in a tweet！），并且逐点讨论在编写用户界面时，该库的功能是否有用。
 
-> **Note** Despite our best efforts, we will not be able to cover the whole Reactive Extensions in this chapter. This topic is so huge it deserves a book on its own. And in fact, there are such books (even free ones!) - check out the Learn more section.
+**注意** 尽管我们尽了最大的努力，我们将无法在本章中覆盖整个 Reactive Extensions。 这个话题是如此巨大，它本身就是一本书。 事实上，有这样的书（甚至是免费的）！ - 看看了解更多部分。
 
-## Observable sequences
-The most important concept of Reactive Extensions is a *sequence of data*, also know as a *stream*. The stream is simply a discrete series of values (of whatever type). This series of values can be either finite or infinite. The finite sequences can end normally or by signalling an error, and the infinite sequences end only if they signal an error or when your program exits.
+## 可观察序列
 
-As it turns out, this simple abstraction can be used to model a huge amount of different systems. Here are some examples:
+Reactive Extensions 最重要的概念是 *数据序列* ，也称为 *流* 。流只是一系列不连续的数值（不管什么类型）。这一系列的值可以是有限的或无限的。有限序列可以正常结束或通过发出错误信号，无限序列只有在发出错误信号或程序退出时才会结束。
 
-1. Stock prices of ACME - a series of decimal values with timestamps. It is finite - it ends normally (when stock market closes) or with error (when there is a connection issue with the server).
-1. Mouse position - series of XY double values, sampled with constant frequency. It is infinite - starts when the program starts, ends when the program terminates.
-1. Tweets by [@ReactiveXUI](https://twitter.com/ReactiveXUI) - a series of strings. It is a sequence that is infinite, unless it ends with an error caused by Twitter downtime.
-1. Button clicks - a series of `Unit` values. A new value appears each time the button is clicked. It is infinite - ends only when program terminates.
+事实证明，这个简单的抽象可以用来建模大量不同的系统。这里有些例子：
 
-> **Info** Unit type is a special type that allows one, and only one, value. Think of it as meaning "nothing" or "void".
+1. ACME 的股票价格 - 带有时间戳的一系列十进制值。它是有限的 - 它正常结束（当股市关闭时）或错误（当服务器发生连接问题时）。
+1. 鼠标位置 - XY 双值的系列，以恒定频率采样。它是无限的 - 程序启动时启动，程序终止时结束。
+1. 推文 [@ReactiveXUI](https://twitter.com/ReactiveXUI)  - 一系列字符串。这是一个无限的序列，除非它以 Twitter 停机时引起的错误结束。
+1. 按钮点击 - 一系列 `Unit` 值。每次点击按钮时都会显示一个新值。它是无限的 - 仅当程序终止时才结束。
 
-You should easily come out with your own examples of streams similar to the listed ones. All of these problems can be easily modelled using Reactive Extensions primary type, which is `IObservable<T>`.
+*信息*  `Unit` 类型是一种特殊类型，允许且只允许一个值。等同于着“无”或“无效”。
 
-## The type to observe them all
-To understand  the role of `IObservable<T>` let's analyze the diagram below displaying several options of a return type from a function. Available options are categorized based on two factors: the number of elements returned from a function and whether function returns synchronously (is blocking) or asynchronously (is not blocking).
+应该很容易地找到类似的例子。所有这些问题都可以使用 Reactive Extensions 主要类型（即 `IObservable <T>`）轻松建模。
 
-|              |single item   | multiple items  |
+## 用于观察的类型
+
+为了理解 `IObservable<T>` 的作用，请看下面的表格。
+
+|              |单个对象   | 多个对象  |
 |:------------:|:-------------:|:-----:|
-| synchronous  | `T getFoo()` | `IEnumerable<T> getFoos()` |
-| asynchronous | `Task<T> getFoo()` | `IObservable<T> getFoos()` |
+| 同步  | `T getFoo()` | `IEnumerable<T> getFoos()` |
+| 异步 | `Task<T> getFoo()` | `IObservable<T> getFoos()` |
 
-You can see that `IObservable<T>` returns asynchronously, which makes it similar to `Task<T>`, except it is able to return more than a single element.
+可以看到 `IObservable<T>` 的返回值是异步的，和 `Task<T>` 差不多，除了它能够返回多个元素之外。
 
-You can also compare `IObservable<T>` to `IEnumerable<T>`.  `IEnumerable<T>` is **pull-based** - that means that you have to explicitly ask it to give you a next element in the sequence (e.g. in a foreach loop, after processing one element, you try to get the next one). `IObservable<T>` is **push-based** - you do not have to ask for a next element in a sequence, it is delivered to the client whenever a new sequence element is available.
+可以比较一下 `IObservable<T>` 和 `IEnumerable<T>`。`IEnumerable<T>` **基于拉取** - 就是说必须明确的请求序列中的下一个元素（比如 foreach 循环中，处理完一个元素后，尝试取得下一个）。`IObservable<T>` **基于推送** - 无需询问下一个元素，在下一个元素可用的时候自动送达。
 
-The syntax for consuming  `IObservable<T>` differs slightly from using both `Task<T>` and `IEnumerable<T>`. The core method is called `Subscribe`, and has following signature:
+使用 `IObservable<T>` 的语法与 `Task<T>` 和 `IEnumerable<T>` 不同。核心方法叫做 `Subscribe`，其签名如下：
 
 `IDisposable Subscribe(this IObservable<T> self, Action<T> onNext, Action<Exception> onError, Action onCompleted)`
 
-And is used simply:
+简单用法：
 
 ```
 IObservable<T> stream = getFoos();
@@ -46,9 +48,9 @@ IDisposable disposable = stream.Subscribe(
 	() => Console.WriteLine("Stream ended"));
 ```
 
-As you can see, you are able to specify actions which will be triggered whenever a new element arrives ("New element arrived"). We can also specify what should happen in the event of an error ("Uh oh"), as well as stream ending normally ("Stream ended").
+正如所见，可以指定新元素抵达时的触发的动作，也可以指定发生错误时的动作，还可以为指定流正常结束的动作。
 
-If you're wondering about the returned `IDisposable` from `Subscribe`, it is how you "unsubscribe" from the stream. Like this:
+如果对 `Subscribe` 返回的 `IDisposable` 有所顾虑，可以从流中“取消订阅”。比如：
 
 ```
 disposable.Dispose();
@@ -56,33 +58,36 @@ disposable.Dispose();
 // even if there is a new element available
 ```
 
-You can think of it as an equivalent of `-=` operator for standard .Net event handlers.
+可以看作 .NET 事件处理程序中的 `-=` 操作。
 
-## Composability
-Let's go back to our single-sentence definition:
+## 组合性
 
-> ReactiveX is library for composing asynchronous and event-based programs by using observable sequences and LINQ-style query operators.
+我们回到我们的单句定义：
 
-You already know what "observable sequences" are all about. Now, the fun part begins. 
+> ReactiveX 是一个将基于事件的程序异步化的库， 通过使用可观察序列和 LINQ 式查询运算符。
 
-You should agree that the best thing about `IEnumerable<T>` interface is the whole LINQ thing, making filtering, transforming and combining sequences very easy. Good news - Reactive Extensions allow you to do all the things you know from LINQ! Moreover, apart from standard LINQ operations like `Select`, `Where` or `GroupBy`, Reactive Extensions provides you a set of powerful time based operations. They let you (for example) delay the arrival time of elements of a sequence, or filter them only when the new elements arrive too fast to be processed.
+你已经知道“可观察序列”是什么。 现在，有趣的部分开始了。
 
-## Asynchronous and event-based
-The definition of Reactive Extensions promises providing a way to construct asynchronous and event-based programs. From the perspective of UI programming, it is very important that the library provides a convenient way to decide to which synchronization context should your data be delivered. A lot of UI frameworks require you to access UI elements only from a specific UI thread.
+`IEnumerable <T>` 接口是整个 LINQ 最好的东西，其使得过滤，转换和组合顺序非常简单。 好消息是 - Reactive Extensions 可以完成和 LINQ 类似的工作。 此外，除了标准的 LINQ 操作，如 `Select`，`Where` 或 `GroupBy` ，Reactive Extensions 提供了一组强大的基于时间的操作。 它们允许（例如）延迟序列元素的到达时间，或者仅当新元素到达太快而无法处理时，才对其进行过滤。
 
-Using Reactive Extensions, you can parametrize the concurrency of the stream using `Scheduler` class. For instance, you can declare that all of the data processing should be executed on a `TaskPool` thread, and then (after the whole processing) deliver final values directly to UI thread. This mechanism is very flexible, easy to maintain, and - last but not least - easy to test. Since the synchronization context for your operation is hidden by an abstraction layer of your `Scheduler`, you can easily mock it. That allows you to easily simulate the passage of time in your unit tests.
+## 异步与基于事件
 
-## Learn more
-As we stated at the beginning, it is not possible do describe such a huge topic as Reactive Extensions library in a single article. In fact, we have barely scratched the surface in this introduction.
+Reactive Extensions 的定义承诺提供将基于事件的程序异步化的方法。 从 UI 编程的角度来看，库提供了一种方便的方式来决定数据传递到哪个同步上下文是很重要的。 很多 UI 框架要求仅从特定的 UI 线程访问 UI 元素。
 
-If you want to learn more, there are a lot of free resources available online. You should start with a [Introduction to Rx](http://www.introtorx.com), a free book covering all aspects of the library in a very accessible way. Another great learning material can be found on the [Reactive Extensions official website](http://reactivex.io/intro.html).
+使用 Reactive Extensions，可以使用 `Scheduler` 类参数化流的并发性。 例如，您可以声明所有的数据处理应该在 `TaskPool` 线程上执行，然后（在整个处理之后）直接向 UI 线程传递最终值。 这种机制非常灵活，易于维护，而且 - 最后但并非最不重要 - 易于测试。 由于操作的同步上下文由 `Scheduler` 的抽象层隐藏，可以轻松地模拟它。 这允许轻松地在单元测试中模拟时间流逝。
 
-If you are not into reading the whole book on the topic right away, you can check out [the introduction to Reactive Programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754). It's a great read, easy to follow, not too shallow nor too deep. This article is based on [RxJS](https://github.com/ReactiveX/RxJS) - a JavaScript flavor of the library - but this should not be a problem (some functions names may differ, but the concepts are exactly the same).
+## 扩展学习
 
-If you are more into video tutorials, check out the [Becoming a C# Time Lord](https://channel9.msdn.com/Events/TechEd/Australia/2013/DEV422) presentation by Joe Albahari. 
+正如我们在开头所说，在一篇文章中描述 Reactive Extensions library 这样一个巨大的话题是不可能的。事实上，在这个介绍中表面上的都没讲完。
 
-If you wish to see some examples of the library usage, there is no better place than [Rx 101 samples wiki](http://rxwiki.wikidot.com/101samples).
+如果想了解更多信息，网上有大量免费资源。首先是 [Introduction to Rx](http://www.introtorx.com)，一本免费的书，以非常方便的方式介绍库的各个方面。 [Reactive Extensions 官方网站](http://reactivex.io/intro.html)上还可以找到另一个很好的学习资料。
 
-We also encourage you to play with the [Rx marbles](http://rxmarbles.com/) - an interactive website displaying how different Rx operators work.
+如果不能立即阅读关于该主题的整本书，您以查看 [the introduction to Reactive Programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)。这是一个很好的文章，容易跟随，不太浅也不太深。本文是基于 [RxJS]https://github.com/ReactiveX/RxJS)  - 一个JavaScript的风格的库 - 但这不应该是一个问题（一些函数名称可能会有所不同，但概念是完全相同的）。
 
-Finally, there is [a huge list of tutorials and other learning materials](http://reactivex.io/tutorials.html) on the Reactive Extensions website. Feel free to browse!
+如果更需要视频教程，请查看 Joe Albahari 的 [Becoming a C# Time Lord](https://channel9.msdn.com/Events/TechEd/Australia/2013/DEV422)。
+
+如果希望看到库使用的一些示例，那么没有比 [Rx 101 samples wiki](http://rxwiki.wikidot.com/101samples) 更好的地方。
+
+我们还鼓励使用 [Rx marbles](http://rxmarbles.com/) - 这是一个互动网站，显示不同的 Rx 操作符的工作方式。
+
+最后，Reactive Extensions 网站上有[很多教程和其他学习资料](http://reactivex.io/tutorials.html)。随意浏览！
