@@ -6,11 +6,11 @@
 
 由于您正在阅读本文档，所以上面的解释不是很有帮助。**所以，让我们再来一次**。
 
-模型-视图-视图模型是一种构建应用程序的方法。这个想法，可以帮助组织类和他们之间的交互。请注意，MVVM **不是**特定的库或 API。相反，它可以被描述为[*定义应用程序体系结构的一种方法*](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/)。
+模型-视图-视图模型是一种构建应用程序的方法。这个想法，可以帮助组织类和他们之间的交互。请注意，MVVM **不是** 特定的库或 API。相反，它可以被描述为[*定义应用程序体系结构的一种方法*](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/)。
 
-有许多使用 MVVM 的库和框架，或者帮助您以 MVVM 的方式塑造您的程序体系结构。其中一个当然是 [ReactiveUI](http://reactiveui.net/)。还有其他的，例如 [MvvmCross](http://mvvmcross.com/)，[MvvmLight](http://www.mvvmlight.net/)，[Caliburn.Micro](http://caliburnmicro.com/) 以及[其他](https://www.nuget.org/packages?q=mvvm)。所有这些库都有一个共同的目标 - 其目的是帮助您将 UI 和业务代码分解成可维护的部分。
+有许多使用 MVVM 的库和框架，或者帮助以 MVVM 的方式塑造程序体系结构。其中一个当然是 [ReactiveUI](http://reactiveui.net/)。还有其他的，例如 [MvvmCross](http://mvvmcross.com/)，[MvvmLight](http://www.mvvmlight.net/)，[Caliburn.Micro](http://caliburnmicro.com/) 以及[其他](https://www.nuget.org/packages?q=mvvm)。所有这些库都有一个共同的目标 - 其目的是帮助将 UI 和业务代码分解成可维护的部分。
 
-模型-视图-视图模型模式的名称来自三层应用程序。您可以将它们设想为三个独立的部分，其中包含您应用程序中的一些代码。实际上，这意味着属于这些层的代码位将被存储在不同的文件夹，命名空间甚至项目中。
+模型-视图-视图模型模式的名称来自应用程序的三层。可以将它们设想为三个独立的部分，其中包含应用程序中的一些代码。实际上，这意味着属于这些层的代码位将被存储在不同的文件夹，命名空间甚至项目中。
 
 ## 视图
 
@@ -18,11 +18,11 @@
 
 所有的用户界面控件属于 *视图* 层。这包括按钮，输入框，警报弹出窗口，以及最近被黑客攻击的那个花哨的日历窗口小部件。
 
-请注意，在 MVVM 世界中， *视图* 一词有两个含义。我们已经提到了第一个，这是你的应用程序层。但是 *视图* 也可以是**一个组合几个逻辑连接的用户控件的类**。
+请注意，在 MVVM 世界中， *视图* 一词有两个含义。我们已经提到了第一个，这是应用程序的一层。但是 *视图* 也可以是**一个组合几个逻辑连接的用户控件的类**。
 
-这可以是一个 `Page` 类，如果你在 Xamarin 中开发的话。在 WPF 中，这将是一个 `Window` 类。对于 WinForms，该类称为 `Form` 。您通常从这些类继承，并用按钮，输入和其他有用的元素填充它们。*视图* 类的名称通常对应于它们的功能 - 如 `LoginView` 或 `OrderCheckoutView`。
+这可以是一个 `Page` 类，如果在 Xamarin 中开发的话。在 WPF 中，这将是一个 `Window` 类。对于 WinForms，该类称为 `Form` 。通常从这些类继承，并用按钮，输入和其他有用的元素填充它们。*视图* 类的名称通常对应于它们的功能 - 如 `LoginView` 或 `OrderCheckoutView`。
 
-*Vi视图* 类的重要属性是通常**不能进行单元测试**的事实。
+*视图* 类的重要特征是通常**不能进行单元测试**。
 
 大多数 UI 框架在设计时对单元测试几乎没有考虑，或者认为这些超出范围。因此，UI 对象通常非常难以在单元测试运行器中进行测试，因为它们不仅仅是简单的对象。它们可能具有依赖于现有的循环，或者通常期望以某种方式初始化静态类/全局变量。
 
@@ -36,13 +36,13 @@
 
 *视图模型* 类公开可以被应用程序 UI 使用的数据和操作。数据通过公共属性暴露给 *视图* 。这些操作只是一个 *视图模型* 的方法，它被包含在所谓的[`命令`类](commands/index.md)中。通常，命令允许在执行 *视图模型* 的关联方法时执行。
 
-数据和命令由与 *视图模型* 关联的 *视图* 类使用。属性被读取和写入（例如在文本框中），而通常在用户按下按钮时执行命令。有助于保持 *视图* 和 *视图模型* 状态同步的机制称为[数据绑定](binding/index.md)。
+数据和命令由与 *视图模型* 关联的 *视图* 类使用。属性被读取和写入（例如在文本框中），而通常在用户按下按钮时执行命令。这种有助于保持 *视图* 和 *视图模型* 状态同步的机制称为[数据绑定](binding/index.md)。
 
 *视图模型* 的另一个重要方面是它们是将策略与机制分开的抽象。 *视图模型* 不涉及按钮和菜单和文本框的细节，它们只描述了这些元素中的数据是如何相关的。例如，*复制* 命令没有直接了解与它连接的菜单项或按钮，它只对 *复制操作* 进行建模。 *视图* 有责任将 *复制* 命令映射到调用它的控件。
 
 请注意， *视图* 类持有对 *视图模型* 的引用，而不是相反。事实上， *视图* 可以自由地与 *视图模型* 紧密绑定。
 
-*视图模型不引用视图的事实* 有很好的效果。因为 *视图模型* 没有明确引用 UI 框架或控件，它们可以 *跨平台重用* 。例如，您可以对 Xamarin 和 WPF 应用程序使用相同的视图模型。
+*视图模型不引用视图* 有很好的效果。因为 *视图模型* 没有明确引用 UI 框架或控件，它们可以 *跨平台重用* 。例如，您可以对 Xamarin 和 WPF 应用程序使用相同的视图模型。
 
 所有 *视图模型* 类合在一起构成应用程序的 *视图模型* 层。
 
@@ -60,8 +60,8 @@
 
 网上有许多关于 MVVM 的介绍材料。如果需要，可以阅读 [great introductory article written by qmatteoq](http://wp.qmatteoq.com/the-mvvm-pattern-introduction/) 。也许会喜欢 [this entertaining piece by Jeremiah Morrill ](http://jmorrill.hjtcentral.com/Home/tabid/428/EntryId/433/Anatomy-of-an-MVVM-Application-or-How-Tards-Like-Me-Make-MVVM-Apps.aspx).
 
-## All other articles on MVVM I have seen had diagrams included. Can I get one?
+## 示意图
 
-Sure, here you go.
+请看：
 
 ![](https://i.stack.imgur.com/yDjEr.png)

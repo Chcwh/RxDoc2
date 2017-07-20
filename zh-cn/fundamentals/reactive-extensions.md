@@ -17,7 +17,7 @@ Reactive Extensions 最重要的概念是 *数据序列* ，也称为 *流* 。�
 1. 推文 [@ReactiveXUI](https://twitter.com/ReactiveXUI)  - 一系列字符串。这是一个无限的序列，除非它以 Twitter 停机时引起的错误结束。
 1. 按钮点击 - 一系列 `Unit` 值。每次点击按钮时都会显示一个新值。它是无限的 - 仅当程序终止时才结束。
 
-*信息*  `Unit` 类型是一种特殊类型，允许且只允许一个值。等同于着“无”或“无效”。
+*信息*  `Unit` 类型是一种特殊类型，允许且只允许一个值。等同于着“无（null）”或“无效（void）”。
 
 应该很容易地找到类似的例子。所有这些问题都可以使用 Reactive Extensions 主要类型（即 `IObservable <T>`）轻松建模。
 
@@ -54,8 +54,8 @@ IDisposable disposable = stream.Subscribe(
 
 ```
 disposable.Dispose();
-// no more "New element arrived" printed from now on
-// even if there is a new element available
+// 从现在开始不会继续输出 "New element arrived" 
+// 即便有新元素可用
 ```
 
 可以看作 .NET 事件处理程序中的 `-=` 操作。
@@ -72,13 +72,13 @@ disposable.Dispose();
 
 ## 异步与基于事件
 
-Reactive Extensions 的定义承诺提供将基于事件的程序异步化的方法。 从 UI 编程的角度来看，库提供了一种方便的方式来决定数据传递到哪个同步上下文是很重要的。 很多 UI 框架要求仅从特定的 UI 线程访问 UI 元素。
+Reactive Extensions 的定义承诺提供将基于事件的程序异步化的方法。 从 UI 编程的角度来看，库提供一种方便的方式来决定数据传递到哪个同步上下文是很重要的。 很多 UI 框架要求仅从特定的 UI 线程访问 UI 元素。
 
-使用 Reactive Extensions，可以使用 `Scheduler` 类参数化流的并发性。 例如，您可以声明所有的数据处理应该在 `TaskPool` 线程上执行，然后（在整个处理之后）直接向 UI 线程传递最终值。 这种机制非常灵活，易于维护，而且 - 最后但并非最不重要 - 易于测试。 由于操作的同步上下文由 `Scheduler` 的抽象层隐藏，可以轻松地模拟它。 这允许轻松地在单元测试中模拟时间流逝。
+使用 Reactive Extensions，可以使用 `Scheduler` 类参数化流的并发性。 例如，可以声明所有的数据处理应该在 `TaskPool` 线程上执行，然后（在整个处理之后）直接向 UI 线程传递最终值。 这种机制非常灵活，易于维护，而且 - 最后但并非最不重要 - 易于测试。 由于操作的同步上下文由 `Scheduler` 的抽象层隐藏，可以轻松地模拟它。 这允许轻松地在单元测试中模拟时间流逝。
 
 ## 扩展学习
 
-正如我们在开头所说，在一篇文章中描述 Reactive Extensions library 这样一个巨大的话题是不可能的。事实上，在这个介绍中表面上的都没讲完。
+正如我们在开头所说，在一篇文章中描述 Reactive Extensions 库 这样一个巨大的话题是不可能的。事实上，在这个介绍中表面上的都没讲完。
 
 如果想了解更多信息，网上有大量免费资源。首先是 [Introduction to Rx](http://www.introtorx.com)，一本免费的书，以非常方便的方式介绍库的各个方面。 [Reactive Extensions 官方网站](http://reactivex.io/intro.html)上还可以找到另一个很好的学习资料。
 
