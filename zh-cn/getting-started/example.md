@@ -4,6 +4,7 @@
 
 现在创建一个简单的应用程序来演示一些 ReactiveUI 功能，不会引入太多的内部细节。
 
+这里将创建一个WPF应用程序，允许搜索 Flickr 的公共图像。
 
 应用程序的完整代码在本章末尾，将在相关代码段中显示。
 
@@ -51,6 +52,7 @@ public class AppViewModel : ReactiveObject
         set { this.RaiseAndSetIfChanged(ref _SearchTerm, value); }
     }
 
+	// ReactiveCommand 是一个命令（比如“打开”，“复制”，“删除”），管理了一个在后台运行的任务。命令的具体内容将会在后面声明。
     public ReactiveCommand<string, List<FlickrPhoto>> ExecuteSearch { get; protected set; }
 	 
     /* ObservableAsPropertyHelper
@@ -94,6 +96,7 @@ public class AppViewModel : ReactiveObject
 		// 然后获取改变的值，并过滤掉相同的变化，以及空值。
 		
 		// 最后，使用 RxUI 的 InvokeCommand 操作符，调用 ExecuteSearch 命令的的 Execute 方法
+		// 这样，在 CanExecute 返回真的情况下，就会执行命令了。
 		
         this.WhenAnyValue(x => x.SearchTerm)
             .Throttle(TimeSpan.FromMilliseconds(800), RxApp.MainThreadScheduler)
