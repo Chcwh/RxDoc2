@@ -2,31 +2,31 @@
 
 # Reactive UI 101
 
-Let's create a simple application demonstrating a number of ReactiveUI functionalities, without getting into too many under-the-hood details. 
+现在创建一个简单的应用程序来演示一些 ReactiveUI 功能，不会引入太多的内部细节。
 
-We will create a WPF application, which will allow us to search through Flickr public images.   
-The full code of the application is shown at the end of this chapter, and we will show relevant snippets as we go.
 
-In Visual Studio create a new WPF application (.Net 4.5 or above)
+应用程序的完整代码在本章末尾，将在相关代码段中显示。
 
-Our view has been already created for us, the `MainWindow`, so we will proceed with creating our ViewModel.
+在 Visual Studio 中创建一个新的 WPF 应用程序（.Net 4.5或更高版本）
 
-**Add references**
+视图 `MainWindow` 已经创建，所以将继续创建视图模型。
+
+**添加引用**
 ```csharp
 using System.Web;
 ```
 
-**Add NuGet Packages**
+**添加 NuGet 包**
 ```
 Install-Package ReactiveUI
 ```
 
-**Add a new field**
+**添加字段**
 ```csharp
 public AppViewModel ViewModel { get; private set;} 
 ```
 
-**Then assign it a new value inside the MainWindow constructor, and bind this to the DataContext**
+**在 MainWindow 构造函数中创建一个值，并绑定到 DataContext**
 
 ```csharp
 public MainWindow()
@@ -37,17 +37,13 @@ public MainWindow()
 }  
 ```
 
-**Create a new class "AppViewModel"**
+**创建 "AppViewModel" 类**
 ```csharp
-// AppViewModel is where we will describe the interaction of our application
-// (we can describe the entire application in one class since this is very 
-// small). 
+// AppViewModel 里面包含了应用程序的交互逻辑
+// （由于逻辑简单的缘故，整个程序的逻辑都可以放在一个类里面）
 public class AppViewModel : ReactiveObject
 {
-    // In ReactiveUI, this is the syntax to declare a read-write property
-    // that will notify Observers (as well as WPF) that a property has 
-    // changed. If we declared this as a normal property, we couldn't tell 
-    // when it has changed!
+	// 在 ReactiveUI 中，这是定义可以通知观察者属性改变的可读写属性的语法。
     string _SearchTerm;
     public string SearchTerm
     {
@@ -55,30 +51,24 @@ public class AppViewModel : ReactiveObject
         set { this.RaiseAndSetIfChanged(ref _SearchTerm, value); }
     }
 
-    // We will describe this later, but ReactiveCommand is a Command
-    // (like "Open", "Copy", "Delete", etc), that manages a task running
-    // in the background.
     public ReactiveCommand<string, List<FlickrPhoto>> ExecuteSearch { get; protected set; }
-
+	 
     /* ObservableAsPropertyHelper
      * 
-     * Here's the interesting part: In ReactiveUI, we can take IObservables
-     * and "pipe" them to a Property - whenever the Observable yields a new
-     * value, we will notify ReactiveObject that the property has changed.
+     * 在 ReactiveUI 中，可以将可观察对象“引导”到一个属性上。
+     * 在可观察对象有一个新值的时候，将会通知 ReactiveObject 该属性发生了改变。
      * 
-     * To do this, we have a class called ObservableAsPropertyHelper - this
-     * class subscribes to an Observable and stores a copy of the latest value.
-     * It also runs an action whenever the property changes, usually calling
-     * ReactiveObject's RaisePropertyChanged.
-     */
+     * 要做到这一点，可以使用 ObservableAsPropertyHelper 类。该类可以订阅一个
+     * 可观察对象，并存储最新值的副本。并在属性发生该改变时执行某些动作，通常
+     * 是调用 ReactiveObject 的 RaisePropertyChanged。
+     * 
+     * 
+     */	 
     ObservableAsPropertyHelper<List<FlickrPhoto>> _SearchResults;
     public List<FlickrPhoto> SearchResults => _SearchResults.Value;
 
-    // Here, we want to create a property to represent when the application 
-    // is performing a search (i.e. when to show the "spinner" control that 
-    // lets the user know that the app is busy). We also declare this property
-    // to be the result of an Observable (i.e. its value is derived from 
-    // some other property)
+	// 创建一个指示是否正在执行搜索的属性（比如显示 “Spinner” 控件，让用户知道程序忙）。
+	// 可以将这个属性作为某个可观察对象的结果（比如其值由其它属性驱动）
     ObservableAsPropertyHelper<Visibility> _SpinnerVisibility;
     public Visibility SpinnerVisibility => _SpinnerVisibility.Value;
 
@@ -88,67 +78,51 @@ public class AppViewModel : ReactiveObject
             searchTerm => GetSearchResultsFromFlickr(searchTerm)
         );
 
-        /* Creating our UI declaratively
-         * 
-         * The Properties in this ViewModel are related to each other in different 
-         * ways - with other frameworks, it is difficult to describe each relation
-         * succinctly; the code to implement "The UI spinner spins while the search 
-         * is live" usually ends up spread out over several event handlers.
-         *
-         * However, with RxUI, we can describe how properties are related in a very 
-         * organized clear way. Let's describe the workflow of what the user does in
-         * this application, in the order they do it.
-         */
-
-        // We're going to take a Property and turn it into an Observable here - this
-        // Observable will yield a value every time the Search term changes (which in
-        // the XAML, is connected to the TextBox). 
-        //
-        // We're going to use the Throttle operator to ignore changes that 
-        // happen too quickly, since we don't want to issue a search for each 
-        // key pressed! We then pull the Value of the change, then filter 
-        // out changes that are identical, as well as strings that are empty.
-        //
-        // Finally, we use RxUI's InvokeCommand operator, which takes the String 
-        // and calls the Execute method on the ExecuteSearch Command, after 
-        // making sure the Command can be executed via calling CanExecute.
+		
+        /* 以声明的方式创建 UI
+		/*
+		 * 视图模型中的属性以各种方式相互关联。在其他框架中，要简洁的描述这些关系很困难。
+		 * 实现“在搜索进行时显示 UI spinner ”的代码都可能需要数个事件处理程序。
+		 *
+		 * 但是，使用 RxUI ，可以用浅显易懂的方式描述属性之间的关系。
+		 * 以用户完成的顺序，描述用户的工作流。
+		 */
+		
+		// 将一个属性变成可观察对象，该可观察对象在属性发生改变时，发出一个值。
+		
+		// 使用 Throttle 操作符来过滤过于频繁的变化，因为不想为每次键入进行搜索。
+		// 然后获取改变的值，并过滤掉相同的变化，以及空值。
+		
+		// 最后，使用 RxUI 的 InvokeCommand 操作符，调用 ExecuteSearch 命令的的 Execute 方法
+		
         this.WhenAnyValue(x => x.SearchTerm)
             .Throttle(TimeSpan.FromMilliseconds(800), RxApp.MainThreadScheduler)
             .Select(x => x?.Trim())
             .DistinctUntilChanged()
             .Where(x => !String.IsNullOrWhiteSpace(x))
             .InvokeCommand(ExecuteSearch);
-
-        // How would we describe when to show the spinner in English? We 
-        // might say something like, "The spinner's visibility is whether
-        // the search is running". RxUI lets us write these kinds of 
-        // statements in code.
-        //
-        // ExecuteSearch has an IObservable<bool> called IsExecuting that
-        // fires every time the command changes execution state. We Select() that into
-        // a Visibility then we will use RxUI's
-        // ToProperty operator, which is a helper to create an 
-        // ObservableAsPropertyHelper object.
+		
+		// 用文字怎么描述什么时候显示 spinner ：“ spinner 的可见性取决于是否正在搜索 ”
+		// 使用 RxUI ，可以在代码中也这么写
+		
+		// ExecuteSearch 有一个叫做 IsExecuting 的 IObservable<bool> 。
+		// 其在每次命令改变执行状态的时候都会触发。
+		// 可以使用个 Select() 将其转换为 Visibility。
+		// 然后使用 ToProperty 操作符，创建一个 ObservableAsPropertyHelper 对象。
 
         _SpinnerVisibility = ExecuteSearch.IsExecuting
             .Select(x => x ? Visibility.Visible : Visibility.Collapsed)                
             .ToProperty(this, x => x.SpinnerVisibility, Visibility.Hidden);
         
-        // We subscribe to the "ThrownExceptions" property of our ReactiveCommand,
-        // where ReactiveUI pipes any exceptions that are thrown in 
-        // "GetSearchResultsFromFlickr" into. See the "Error Handling" section
-        // for more information about this.
+		// 订阅 ReactiveCommand 的 ThrownExceptions 属性，可以获取执行过程中抛出的异常。
+		// 更多细节，查看“错误处理”章节。		
         ExecuteSearch.ThrownExceptions.Subscribe(ex => {/* Handle errors here */});
 
-        // Here, we're going to actually describe what happens when the Command
-        // gets invoked - we're going to run the GetSearchResultsFromFlickr every
-        // time the Command is executed. 
-        //
-        // The important bit here is the return value - an Observable. We're going
-        // to end up here with a Stream of FlickrPhoto Lists: every time someone 
-        // calls Execute, we eventually end up with a new list which we then 
-        // immediately put into the SearchResults property, that will then 
-        // automatically fire INotifyPropertyChanged.
+		// 这里，将描述命令调用时执行的内容。这里是执行 GetSearchResultsFromFlickr。
+		
+		// 重点是返回值 ———— 一个可观察对象。这里是 FlickrPhoto 列表的流：
+		// 每次执行，都会得到一个新的列表，并立即赋值给 SearchResults 属性，
+		// 并自动出发 INotifyPropertyChanged 。
         _SearchResults = ExecuteSearch.ToProperty(this, x => x.SearchResults, new List<FlickrPhoto>());
     }
 
@@ -202,6 +176,20 @@ throttled change in the UI, so let's define what should happen when a user execu
 
 Create a simple model class to hold the Flickr results - since we never update the properties once we've created the object, we don't have to use a ReactiveObject.
 
+ReactiveUI 读写属性的语法的目的是通知观察者们属性已更改。否则在改变的时候就不知道了。
+
+ExecuteSearch 基本上是一个异步的任务，在后台执行。
+
+在我们不需要在视图和视图模型之间提供双向绑定的情况下，我们可以使用许多 ReactiveUI Helper 中的一个来通知观察者们 视图模型中某个只读值的更改。这里使用了 ObservableAsPropertyHelper 两次，一次将通用列表转换为可观察的只读集合，另一次是更改 spinner 的可见性，以显示当前正在执行请求。
+
+当采用 `SearchTerm` 属性并将其转换成可观察值时，也可以在相反的方向工作。这意味着每当 UI 中发生更改时都会收到通知。使用Reactive Extensions，然后过滤这些事件，并确保搜索发生在最后一次键入的 800ms 之后。而且如果用户没有更改最后一个值，或者如果搜索项是空白的，那么完全忽略该事件。
+
+使用 `ReactiveCommand` 的 `IsExecuting` 可观察对象，我们导驱动另一个可观察对象来更改 “spinner” 的可见性。
+
+每次在 UI 中发生已过滤的更改时，都会调用 `GetSearchResultsFromFlickr` 方法，因此可以定义当用户执行新的搜索时的执行逻辑。
+
+创建一个简单的模型类来保存 Flickr 结果 - 因为一旦创建了对象，就不会更新属性，所以不必继承 ReactiveObject。
+
 ```csharp
 namespace FlickrBrowser
 {
@@ -214,9 +202,9 @@ namespace FlickrBrowser
 }
 ```
 
-**Our ViewModel is now complete**
+**完成视图模型**
 
-Now we need to create a View for our view model, the following is an example
+为视图模型创建视图，如下：
 
 ```xml
 <Window x:Class="FlickrBrowser.MainWindow"
